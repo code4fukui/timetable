@@ -7,12 +7,42 @@
 <script type='module'>
 
 const main = async function() {
+  const chks = []
+  const level = { '小学': 6, '中学': 3, '高校': 3, '大人': 1 }
+  for (const lv in level) {
+    const head = document.createElement('span')
+    head.textContent = lv
+    filters.appendChild(head)
+    head.chks = []
+    for (let i = 1; i <= level[lv]; i++) {
+      const label = document.createElement('label')
+      const chk = document.createElement('input')
+      chk.type = 'checkbox'
+      chk.value = lv == '大人' ? lv : lv + i + '年'
+      chk.checked = true
+      label.appendChild(chk)
+      const span = document.createElement('span')
+      span.textContent = lv == '大人' ? '' : i + '年生'
+      label.appendChild(span)
+      filters.appendChild(label)
+      chks.push(chk)
+      head.chks.push(chk)
+    }
+    head.onclick = function() {
+      const flg = !this.chks[0].checked
+      for (const chk of this.chks) {
+        chk.checked = flg
+      }
+    }
+    filters.appendChild(document.createElement('br'))
+  }
+
   const url = 'data/funs.csv'
   const data = await fetchCSVtoJSON(url)
 
   const show = function() {
     timetable.innerHTML = ''
-    const tt = makeTimeTable(data)
+    const tt = makeTimeTable(data, chks)
     timetable.appendChild(tt)
   }
   show()
@@ -25,16 +55,23 @@ import util from './util.mjs'
 
 const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
 
-const makeTimeTable = function(data) {
+const makeTimeTable = function(data, chks) {
   const weeks = '月火水木金'
   const nhour = 4
   const nfree = 4
   const limit = 4
   
+  util.shuffle(data)
+
   const items = []
   const cnt = {}
-  for (const d of data) {
+  A: for (const d of data) {
     const type = d['科目']
+    const target = d['対象']
+    for (const chk of chks) {
+      if (target.indexOf(chk.value) >= 0 && !chk.checked)
+        continue A
+    }
     if (!cnt[type]) {
       cnt[type] = 1
     } else {
@@ -47,7 +84,6 @@ const makeTimeTable = function(data) {
   for (let i = items.length; i < nhour * weeks.length; i++) {
     items.push(null)
   }
-  util.shuffle(items)
   for (let i = 0; i < nfree; i++) {
     items[util.rnd(items.length)] = null
   }
@@ -89,6 +125,7 @@ body {
 	margin: 0;
   word-wrap: break-word;
   --main-color: rgb(232, 181, 79);
+  text-align: center;
 }
 h1 {
 	margin: 0;
@@ -135,6 +172,10 @@ h2 {
   padding: 0.5em;
   font-size: 70%;
 }
+#filters {
+  display: inline-block;
+  margin: 1em;
+}
 #src {
 	margin: .5em;
 }
@@ -169,6 +210,7 @@ a {
 <div class="buttons">
   <button id="btn" class=btn>ガチャ</button>
 </div>
+<div id='filters'></div>
 
 <div id="link">
 
