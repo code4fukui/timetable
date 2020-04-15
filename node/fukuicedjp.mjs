@@ -126,7 +126,7 @@ const main = async function() {
 
     const title = d['番組名 動画名']
     delete d['番組名 動画名']
-    d['タイトル'] = title
+    d['タイトル'] = title.length == 0 ? d['サイト名'] : title
   }
   // 並び替え
   list.sort(function(a, b) {
