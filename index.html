@@ -1,12 +1,29 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="apple-touch-icon" href="timetable.png"/>
-<meta property="og:image" content="timetable.png"/>
+<link rel="apple-touch-icon" href="gachatt.png"/>
+<meta property="og:image" content="gachatt.png"/>
 <meta name="format-detection" content="telephone=no"/>
 <title>時間割ガチャ - 教材オープンデータから自動生成する時間割</title>
 <script type='module'>
 
+const main = async function() {
+  const url = 'data/funs.csv'
+  const data = await fetchCSVtoJSON(url)
+
+  const show = function() {
+    timetable.innerHTML = ''
+    const tt = makeTimeTable(data)
+    timetable.appendChild(tt)
+  }
+  show()
+
+  btn.onclick = show
+}
+window.onload = main
+
 import util from './util.mjs'
+
+const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
 
 const makeTimeTable = function(data) {
   const weeks = '月火水木金'
@@ -64,23 +81,6 @@ const makeTimeTable = function(data) {
   }
   return c
 }
-
-const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
-
-const main = async function() {
-  const url = 'data/funs.csv'
-  const data = await fetchCSVtoJSON(url)
-
-  const show = function() {
-    timetable.innerHTML = ''
-    const tt = makeTimeTable(data)
-    timetable.appendChild(tt)
-  }
-  show()
-
-  btn.onclick = show
-}
-window.onload = main
 
 </script>
 <style>
