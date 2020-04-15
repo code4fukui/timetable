@@ -127,6 +127,10 @@ const main = async function() {
     const title = d['番組名 動画名']
     delete d['番組名 動画名']
     d['タイトル'] = title.length == 0 ? d['サイト名'] : title
+
+    const type = d['教科']
+    delete d['教科']
+    d['科目'] = type
   }
   // 並び替え
   list.sort(function(a, b) {
