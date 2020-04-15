@@ -150,6 +150,12 @@ exports.json2csv = function(json) {
 exports.addBOM = function(s) {
   return '\ufeff' + s
 }
+exports.removeBOM = function(s) {
+  if (s.charAt(0) == '\ufeff') {
+    return s.substring(1)
+  }
+  return s
+}
 exports.writeCSV = function(fnbase, csvar) {
   const s = this.encodeCSV(csvar)
   //const bom = new Uint8Array([ 0xEF, 0xBB, 0xBF ]) // add BOM
@@ -272,14 +278,6 @@ exports.getHistogram = function(s) {
   ar.sort((a, b) => b[1] - a[1])
   return ar
 }
-exports.fetchText = async function(url, enc) {
-  if (!enc) {
-    return await (await fetch(url)).text()
-  }
-  const abuf = await (await fetch(url)).arrayBuffer()
-  var buf = new Buffer.from(abuf, 'binary')
-  return iconv.decode(buf, enc)
-}
 exports.fetchTextWithLastModified = async function(url, enc, debug) {
   const res = await fetch(url)
   let lastUpdate = null
@@ -303,7 +301,20 @@ exports.fetchTextWithLastModified = async function(url, enc, debug) {
     enc = 'ShiftJIS'
   }
   const buf = new Buffer.from(abuf, 'binary')
+  //console.log(buf, iconv.decode(buf, 'ShiftJIS'))
   return [ iconv.decode(buf, enc), lastUpdate ]
+}
+exports.fetchText = async function(url, enc, debug) {
+  /*
+  if (!enc) {
+    return await (await fetch(url)).text()
+  }
+  const abuf = await (await fetch(url)).arrayBuffer()
+  var buf = new Buffer.from(abuf, 'binary')
+  return iconv.decode(buf, enc)
+  */
+ const res = await this.fetchTextWithLastModified(url, enc, debug)
+ return res[0]
 }
 exports.getWebWithCache = async function(url, path, cachetime, enc) {
   const ext = exports.getExtFromURL(url)
@@ -425,6 +436,8 @@ exports.test = function(t1, t2) {
   console.log(t1, t2)
   throw 'err on util.test'
 }
+exports.sleep = msec => new Promise(resolve => setTimeout(resolve(), msec))
+
 const test = async function() {
   console.log(exports.formatYMDHMS(new Date()))
   exports.test(exports.makeURL('http://sabae.cc/', 'test.html'), 'http://sabae.cc/test.html')
