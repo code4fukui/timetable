@@ -123,6 +123,10 @@ const main = async function() {
       target = '小学1年/小学2年'
     }
     d['学年'] = target
+
+    const title = d['番組名 動画名']
+    delete d['番組名 動画名']
+    d['タイトル'] = title
   }
   // 並び替え
   list.sort(function(a, b) {
