@@ -122,7 +122,8 @@ const main = async function() {
     } else if (target == '小学1・2年' || target == '小学低学年') {
       target = '小学1年/小学2年'
     }
-    d['学年'] = target
+    delete d['学年']
+    d['対象'] = target
 
     const title = d['番組名 動画名']
     delete d['番組名 動画名']
