@@ -19,6 +19,21 @@ const main = async function() {
     timetable.innerHTML = ''
     const tt = makeTimeTable(data, chks, chks2)
     timetable.appendChild(tt)
+
+    const chkd = []
+    for (const chk of chks) {
+      if (chk.checked)
+        chkd.push(chk.value)
+    }
+    document.location.hash = chkd.join(',')
+  }
+  let hash = document.location.hash
+  if (hash.length > 1) {
+    hash = decodeURIComponent(hash.substring(1))
+    console.log('hash', hash)
+    for (const chk of chks) {
+      chk.checked = hash.indexOf(chk.value) >= 0
+    }
   }
   show()
 
@@ -100,19 +115,35 @@ const makeTimeTable = function(data, chks, chks2) {
   const items = []
   const cnt = {}
   A: for (const d of data) {
-    // chks
-    const type = d['科目']
-    const target = d['対象']
-    for (const chk of chks) {
-      if (target.indexOf(chk.value) >= 0 && !chk.checked)
-        continue A
-    }
     // chks2
     const sname = d['教材シリーズ名']
     for (const chk of chks2) {
       if (sname == chk.value && !chk.checked)
         continue A
     }
+
+    // chks
+    const type = d['科目']
+    let target = d['対象']
+    if (target == '小学生') {
+      target = '小学1年/小学2年/小学3年/小学4年/小学5年/小学6年'
+    } else if (target == '中学生') {
+      target = '中学1年/中学2年/中学3年'
+    } else if (target == '小中学生') {
+      target = '小学1年/小学2年/小学3年/小学4年/小学5年/小学6年/中学1年/中学2年/中学3年'
+    } else if (target == '中高生') {
+      target = '中学1年/中学2年/中学3年/高校1年/高校2年/高校3年'
+    } else if (target == '高校生') {
+      target = '高校1年/高校2年/高校3年'
+    }
+    let flg = false
+    for (const chk of chks) {
+      if (chk.checked) {
+         flg = flg || target.indexOf(chk.value) >= 0
+      }
+    }
+    if (!flg)
+      continue
 
     if (!cnt[type]) {
       cnt[type] = 1
