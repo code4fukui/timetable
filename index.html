@@ -7,7 +7,27 @@
 <script type='module'>
 
 const main = async function() {
-  const chks = []
+  const chks = makeTargetFilter(filters1)
+
+  const url = 'data/funs.csv'
+  const data = await fetchCSVtoJSON(url)
+
+  console.log(data[0])
+  const chks2 = makeContentsFilter(filters2, data)
+
+  const show = function() {
+    timetable.innerHTML = ''
+    const tt = makeTimeTable(data, chks, chks2)
+    timetable.appendChild(tt)
+  }
+  show()
+
+  btn.onclick = show
+}
+window.onload = main
+
+const makeTargetFilter = function(filters) {
+ const chks = []
   const level = { '小学': 6, '中学': 3, '高校': 3, '大人': 1 }
   for (const lv in level) {
     const head = document.createElement('span')
@@ -36,42 +56,64 @@ const main = async function() {
     }
     filters.appendChild(document.createElement('br'))
   }
-
-  const url = 'data/funs.csv'
-  const data = await fetchCSVtoJSON(url)
-
-  const show = function() {
-    timetable.innerHTML = ''
-    const tt = makeTimeTable(data, chks)
-    timetable.appendChild(tt)
-  }
-  show()
-
-  btn.onclick = show
+  return chks
 }
-window.onload = main
+const makeContentsFilter = function(filters, data) {
+  const list = []
+  for (const d of data) {
+    const name = d['教材シリーズ名']
+    if (list.indexOf(name) == -1) {
+      list.push(name)
+    }
+  }
+  const chks = []
+  for (const name of list) {
+    console.log(name)
+    const label = document.createElement('label')
+    const chk = document.createElement('input')
+    chk.type = 'checkbox'
+    chk.value = name
+    chk.checked = true
+    label.appendChild(chk)
+    const span = document.createElement('span')
+    span.textContent = name
+    label.appendChild(span)
+    filters.appendChild(label)
+    chks.push(chk)
+    filters.appendChild(document.createElement('br'))
+  }
+  return chks
+}
 
 import util from './util.mjs'
 
 const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
 
-const makeTimeTable = function(data, chks) {
+const makeTimeTable = function(data, chks, chks2) {
   const weeks = '月火水木金'
   const nhour = 4
   const nfree = 4
-  const limit = 4
+  const limit = 5
   
   util.shuffle(data)
 
   const items = []
   const cnt = {}
   A: for (const d of data) {
+    // chks
     const type = d['科目']
     const target = d['対象']
     for (const chk of chks) {
       if (target.indexOf(chk.value) >= 0 && !chk.checked)
         continue A
     }
+    // chks2
+    const sname = d['教材シリーズ名']
+    for (const chk of chks2) {
+      if (sname == chk.value && !chk.checked)
+        continue A
+    }
+
     if (!cnt[type]) {
       cnt[type] = 1
     } else {
@@ -172,9 +214,12 @@ h2 {
   padding: 0.5em;
   font-size: 70%;
 }
-#filters {
+#filters > div {
+  vertical-align: top;
   display: inline-block;
   margin: 1em;
+  padding: .5em;
+  border: 2px solid gray;
 }
 #src {
 	margin: .5em;
@@ -210,7 +255,10 @@ a {
 <div class="buttons">
   <button id="btn" class=btn>ガチャ</button>
 </div>
-<div id='filters'></div>
+<div id='filters'>
+<div id='filters1'></div>
+<div id='filters2'></div>
+</div>
 
 <div id="link">
 
