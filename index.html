@@ -13,7 +13,7 @@ const main = async function() {
   const data = await fetchCSVtoJSON(url)
 
   console.log(data[0])
-  const chks2 = makeContentsFilter(filters2, data)
+  const chks2 = makeContentsFilter(filters2, data, materials)
 
   const show = function() {
     timetable.innerHTML = ''
@@ -73,12 +73,17 @@ const makeTargetFilter = function(filters) {
   }
   return chks
 }
-const makeContentsFilter = function(filters, data) {
+const makeContentsFilter = function(filters, data, materials) {
   const list = []
   for (const d of data) {
     const name = d['教材シリーズ名']
     if (list.indexOf(name) == -1) {
       list.push(name)
+
+      const a = document.createElement('a')
+      a.textContent = name
+      a.href = d['URL']
+      materials.appendChild(a)
     }
   }
   const chks = []
@@ -255,6 +260,9 @@ h2 {
 #src {
 	margin: .5em;
 }
+#materials a {
+  margin-left: 1em;
+}
 a {
 	color: gray !important;
 }
@@ -295,7 +303,7 @@ a {
 
 <div id="src">
 DATA: CC BY 「<a href=https://fukuno.jig.jp/2820>時間割ガチャ - 教材オープンデータあつめ始めました</a>」 <a href=data/funs.csv>CSV</a> / <a href=data/funs.json>JSON</a><br>
-（<a href=https://www.pref.fukui.lg.jp/doc/kyousei/learning_video.html>ふくいわくわく授業 | 福井県ホームページ</a> / <a href=https://pcn.club/channel/>CHANNEL | PCN プログラミング クラブ ネットワーク</a> / <a href=http://www.fukui-c.ed.jp/~fec/kyouzai/review.html>福井県教育総合研究所による動画・教材リンク集</a> / <a href=https://ocw.tsukuba.ac.jp/>筑波大学オープンコースウェア</a>）<br>
+Educatino Materials: <span id='materials'></span><br>
 APP：CC BY <a href='https://fukuno.jig.jp/2820'>fukuno.jig.jp</a> <a href=https://github.com/code4fukui/timetable/>src on GitHub</a><br>
 </div>
 <img id=qrcode><script>addEventListener("load", () => qrcode.src = "https://chart.apis.google.com/chart?chs=140x140&cht=qr&chl=" + encodeURIComponent(document.location))</script><br>
