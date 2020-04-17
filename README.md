@@ -1,6 +1,5 @@
-# timetable
-教材オープンデータでつくる時間割ガチャ  
-https://code4fukui.github.io/timetable/  
+# 教材オープンデータでつくる、時間割ガチャ
+  https://code4fukui.github.io/timetable/  
 
 # オープンデータ
 https://code4fukui.github.io/timetable/data/funs.csv  
