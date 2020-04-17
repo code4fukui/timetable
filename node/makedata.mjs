@@ -1,7 +1,5 @@
-import cheerio from 'cheerio'
 import util from './util.js'
 //import util from './util.mjs'
-import fs from 'fs'
 import fetch from 'node-fetch'
 
 const URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdsFYLU6roC8Y-PB-7MSJxxVByBh-fQxpa-Bcf0Hatykrv8M20ZQ0NAwFF5MBjw7qTZ2NnKRNEBNeP/pub?gid=0&single=true&output=csv'
