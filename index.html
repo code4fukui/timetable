@@ -7,6 +7,7 @@
 <script type='module'>
 
 const main = async function() {
+
   const chks = makeTargetFilter(filters1)
 
   const url = 'data/funs.csv'
@@ -82,7 +83,7 @@ const makeContentsFilter = function(filters, data, materials) {
 
       const a = document.createElement('a')
       a.textContent = name
-      a.href = d['URL']
+      a.href = d['提供URL']
       materials.appendChild(a)
     }
   }

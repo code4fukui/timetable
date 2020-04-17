@@ -22,6 +22,7 @@ const main = async function() {
   const fn = 'funs'
 
   const list = await fetchCSVtoJSON(url)
+  util.writeCSV(path + 'index', util.json2csv(list))
   const data = []
   for (const item of list) {
     const items = await fetchCSVtoJSON(item.URL)
