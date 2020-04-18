@@ -633,4 +633,12 @@ var getLastDayOfMonth = function(year, month) {
 
 const fetchCSVtoJSON = async url => csv2json(decodeCSV(await (await fetch(url)).text()))
 
-export default { csv2json, decodeCSV, addComma, fixfloat, shuffle, rnd, fetchCSVtoJSON }
+const formatYMD = function(t) {
+  if (!t)
+    t = new Date()
+	const fix0 = n => n < 10 ? "0" + n : n
+	return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2)
+}
+
+
+export default { csv2json, decodeCSV, addComma, fixfloat, shuffle, rnd, fetchCSVtoJSON, formatYMD }

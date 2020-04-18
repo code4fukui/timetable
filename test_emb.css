@@ -1,0 +1,77 @@
+body {
+	font-family: sans-serif;
+	margin: 0;
+  word-wrap: break-word;
+  --main-color: #0054c7;
+}
+header {
+	margin: 0;
+	padding: 1em;
+	background-color: var(--main-color);
+	color: white;
+	text-align: center;
+}
+h1 {
+	font-size: 4vw;
+	padding: 1vw;
+	margin: 0;
+}
+.subtitle {
+	font-size: 2vw;
+}
+#contents {
+	margin: 2em;
+}
+
+.codehtml {
+	border: 2px solid black;
+	padding: 1em;
+	margin: .5em 0;
+}
+/* fukui style */
+h4 {
+	font-size: 115%;
+	border-left: 1px solid #0054c7;
+	border-bottom: 1px solid #0054c7;
+	margin-top: 0.5em;
+	margin-bottom: 10px;
+	padding: 0px 0px 5px 10px;
+}
+table {
+	border: 1px solid #999999;
+	margin-bottom: 1em;
+	border-collapse: collapse;
+  border-spacing: 0;
+}
+td {
+	border: 1px solid #999999;
+	text-align: left;
+	vertical-align: middle;
+	padding: 5px 10px;
+}
+a {
+	text-decoration: none;
+	color: #213b92;
+}
+h2 {
+  font-size: 3vw;
+}
+/* main */
+
+#main, #link {
+  text-align: center;
+}
+#src {
+	margin: .5em;
+	text-align: center;
+}
+#src a {
+	color: gray !important;
+}
+#link {
+  margin: 1em;
+}
+#link img {
+  width: 60vw;
+  border: 2px solid gray;
+}

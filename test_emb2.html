@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="format-detection" content="telephone=no"/>
+<title>福井県教育総合研究所によるまとめHTML埋め込みサンプル</title>
+<link rel="stylesheet" type="text/css" href="test_emb.css"/>
+</head>
+<body>
+
+<header>
+	<h1 id=title>福井県教育総合研究所によるまとめHTML埋め込みサンプル</h1>
+	<div class=subtitle>教材リストCSVオープンデータからHTMLを自動生成</div>
+</header>
+
+<div id=contents>
+
+
+	<script data-type="timetable" data-src="https://code4fukui.github.io/timetable/data/fukuicedjp.csv" type="module" src="https://code4fukui.github.io/timetable/emb_fukui.mjs"></script>
+
+</div>
+
+<div id="src">
+<div>APP：CC BY <a href='https://fukuno.jig.jp/'>福野泰介</a> 「<a href=>オープンデータでウェブの更新を楽しよう</a>」 <a href=https://github.com/code4fukui/timetable/>src on GitHub</a></div>
+<div><img id=qrcode><script>addEventListener("load", () => qrcode.src = "https://chart.apis.google.com/chart?chs=140x140&cht=qr&chl=" + encodeURIComponent(document.location))</script></div>
+</div>
+
+</body>
+</html>
