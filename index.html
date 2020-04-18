@@ -41,7 +41,6 @@ const main = async function() {
       const n = parseInt(hex, 16)
       if (isNaN(n))
         return
-      console.log(n)
       for (let i = 0; i < chks.length; i++) {
         chks[i].checked = (n & (1 << i)) != 0
       }
@@ -103,6 +102,7 @@ const makeTargetFilter = function(filters) {
       for (const chk of this.chks) {
         chk.checked = flg
       }
+      this.chks[0].onclick()
     }
     filters.appendChild(document.createElement('br'))
   }
