@@ -1,4 +1,4 @@
-import util from './util.js'
+import util from './util.mjs'
 import fs from 'fs'
 import pdf2text from './pdf2text.mjs'
 

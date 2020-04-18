@@ -2,6 +2,8 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import iconv from 'iconv-lite'
 
+const exports = {}
+
 exports.simplejson2txt = function(json) {
   if (typeof json == 'string') {
     json = JSON.parse(json)
@@ -85,7 +87,6 @@ exports.decodeCSV = function(s) {
 		res.push(line)
 	return res
 }
-exports.convertCSVtoArray = exports.decodeCSV
 
 exports.encodeCSV = function(csvar) {
   let s = []
@@ -177,8 +178,16 @@ exports.fix0 = function(n, beam) {
   return s.substring(s.length - beam)
 }
 exports.formatYMDHMS = function(t) {
+  if (!t)
+    t = new Date()
   const fix0 = exports.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2) + "T" + fix0(t.getHours(), 2) + ":" + fix0(t.getMinutes(), 2) + ":" + fix0(t.getSeconds(), 2)
+}
+exports.formatYMD = function(t) {
+  if (!t)
+    t = new Date()
+  const fix0 = exports.fix0
+  return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2)
 }
 exports.getYMDHMS = function() {
   const t = new Date()
@@ -238,7 +247,7 @@ exports.mkdirSyncForFile = function(fn) {
   for (let i = 0; i < dirs.length - 1; i++) {
     dir += dirs[i] + "/"
     try {
-      fs.mkdirSync(dir, 0744)
+      fs.mkdirSync(dir, 0o0744)
     } catch (e) {
     }
   }
@@ -434,10 +443,27 @@ const test = async function() {
   exports.test(exports.makeURL('https://sabae.cc/abc/test.html', '/img/'), 'https://sabae.cc/img/')
 }
 
-if (require.main === module) {
-//  test()
+exports.splitString = function(s, splitters) {
+  const res = []
+  let n = 0
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charAt(i)
+    if (splitters.indexOf(c) >= 0) {
+      if (i > n)
+        res.push(s.substring(n, i))
+      n = i + 1
+    }
+  }
+  if (n < s.length)
+    res.push(s.substring(n))
+  return res
+}
+
+if (process.argv[1].endsWith('/util.mjs')) {
   for (let i = 0; i < this.JAPAN_PREF.length; i++) {
     console.log((i + 1) + '\t' + this.JAPAN_PREF[i] + "\t" + this.JAPAN_PREF_EN[i])
   }
-} else {
 }
+
+export default exports
+
