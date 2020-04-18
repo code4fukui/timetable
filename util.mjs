@@ -631,4 +631,6 @@ var getLastDayOfMonth = function(year, month) {
 	return 30 + (month + Math.floor(month / 8)) % 2;
 };
 
-export default { csv2json, decodeCSV, addComma, fixfloat, shuffle, rnd }
+const fetchCSVtoJSON = async url => csv2json(decodeCSV(await (await fetch(url)).text()))
+
+export default { csv2json, decodeCSV, addComma, fixfloat, shuffle, rnd, fetchCSVtoJSON }
