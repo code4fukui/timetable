@@ -20,9 +20,10 @@ const main = async function() {
 
   const url = 'data/funs.csv'
   const data = await fetchCSVtoJSON(url)
+  const data_index = await fetchCSVtoJSON('data/index.csv')
 
   //console.log(data[0])
-  const chkscontents = makeContentsFilter(filters2, data, materials)
+  const chkscontents = makeContentsFilter(filters2, data_index, materials)
 
   const langs = [ '日本語', '英語', '中国語', '韓国語', 'ポルトガル語', 'ベトナム語', 'シンハラ語' ]
   const chkslang = makeLanguageFilter(filters3, langs)
@@ -115,10 +116,9 @@ const makeContentsFilter = function(filters, data, materials) {
     if (list.indexOf(name) == -1) {
       list.push(name)
 
-      const a = document.createElement('a')
-      a.textContent = name
-      a.href = d['提供URL']
-      materials.appendChild(a)
+      const span = document.createElement('span')
+      span.innerHTML = `<a href=${d['提供URL']}>${name}</a>(<a href=${d.URL}>CSV</a>)`
+      materials.appendChild(span)
     }
   }
   const chks = []
@@ -324,7 +324,7 @@ h2 {
 #src {
 	margin: .5em;
 }
-#materials a {
+#materials span {
   margin-left: 1em;
 }
 a {
@@ -367,7 +367,7 @@ a {
 <div id="link">
 
 <div id="src">
-DATA: CC BY 「<a href=https://fukuno.jig.jp/2820>時間割ガチャ - 教材オープンデータあつめ始めました</a>」 <a href=data/funs.csv>CSV</a> / <a href=data/funs.json>JSON</a><br>
+DATA: CC BY  <a href=https://fukuno.jig.jp/>福野泰介</a>「<a href=https://fukuno.jig.jp/2823>学生Youtuber活躍! 大人も学ぶ、多言語で学ぶ</a> / <a href=https://fukuno.jig.jp/2820>時間割ガチャ - 教材オープンデータあつめ始めました</a>」 <a href=data/funs.csv>CSV</a> / <a href=data/funs.json>JSON</a><br>
 Educatino Materials: <span id='materials'></span><br>
 APP：CC BY <a href='https://fukuno.jig.jp/2820'>fukuno.jig.jp</a> <a href=https://github.com/code4fukui/timetable/>src on GitHub</a><br>
 </div>
