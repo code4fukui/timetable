@@ -248,7 +248,11 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
     const div = document.createElement('span')
     c.appendChild(div)
     if (d) {
-      div.innerHTML = `${d['対象']} ${d['科目']}<br><a href=${d.URL}>${d['タイトル']}</a>`
+      let lang = d['言語']
+      if (lang) {
+        lang = " (" + lang + ")"
+      }
+      div.innerHTML = `${d['対象']} ${d['科目']}<br><a href=${d.URL}>${d['タイトル']}${lang}</a>`
     } else {
       div.innerHTML = "自由研究"
     }
