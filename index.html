@@ -1,4 +1,13 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"/>
+<!DOCTYPE html><html><head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-162141832-2"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-162141832-2');
+</script>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="apple-touch-icon" href="gachatt.png"/>
 <meta property="og:image" content="gachatt.png"/>
@@ -7,38 +16,60 @@
 <script type='module'>
 
 const main = async function() {
-
-  const chks = makeTargetFilter(filters1)
+  const chkstarget = makeTargetFilter(filters1)
 
   const url = 'data/funs.csv'
   const data = await fetchCSVtoJSON(url)
 
-  console.log(data[0])
-  const chks2 = makeContentsFilter(filters2, data, materials)
+  //console.log(data[0])
+  const chkscontents = makeContentsFilter(filters2, data, materials)
+
+  const langs = [ '日本語', '英語', '中国語', '韓国語', 'ポルトガル語', 'ベトナム語', 'シンハラ語' ]
+  const chkslang = makeLanguageFilter(filters3, langs)
+
+  const chks = [ chkstarget, chkscontents, chkslang ]
 
   const show = function() {
     timetable.innerHTML = ''
-    const tt = makeTimeTable(data, chks, chks2)
+    const tt = makeTimeTable(data, chkstarget, chkscontents, chkslang)
     timetable.appendChild(tt)
-
-    const chkd = []
-    for (const chk of chks) {
-      if (chk.checked)
-        chkd.push(chk.value)
-    }
-    document.location.hash = chkd.join(',')
   }
   let hash = document.location.hash
   if (hash.length > 1) {
-    hash = decodeURIComponent(hash.substring(1))
-    console.log('hash', hash)
-    for (const chk of chks) {
-      chk.checked = hash.indexOf(chk.value) >= 0
+    const hex = hash.substring(1).split(',')
+    const fromHex = function(chks, hex) {
+      const n = parseInt(hex, 16)
+      for (let i = 0; i < chks.length; i++) {
+        chks[i].checked = (n & (1 << i)) != 0
+      }
+    }
+    for (let i = 0; i < Math.max(hex.length, chks.length); i++) {
+      fromHex(chks[i], hex[i])
     }
   }
   show()
 
   btn.onclick = show
+
+  const updateHash = function() {
+    const toHex = function(chks) {
+      let n = 0
+      for (let i = 0; i < chks.length; i++) {
+        n |= (chks[i].checked ? 1 : 0) << i
+      }
+      return n.toString(16)
+    }
+    const hex = []
+    for (const c of chks) {
+      hex.push(toHex(c))
+    }
+    document.location.hash = hex.join(',')
+  }
+  for (const cs of chks) {
+    for (const c of cs) {
+      c.onclick = updateHash
+    }
+  }
 }
 window.onload = main
 
@@ -89,7 +120,7 @@ const makeContentsFilter = function(filters, data, materials) {
   }
   const chks = []
   for (const name of list) {
-    console.log(name)
+    //console.log(name)
     const label = document.createElement('label')
     const chk = document.createElement('input')
     chk.type = 'checkbox'
@@ -105,12 +136,30 @@ const makeContentsFilter = function(filters, data, materials) {
   }
   return chks
 }
+const makeLanguageFilter = function(filters, langs) {
+  const chks = []
+  for (const name of langs) {
+    const label = document.createElement('label')
+    const chk = document.createElement('input')
+    chk.type = 'checkbox'
+    chk.value = name
+    chk.checked = name == '日本語'
+    label.appendChild(chk)
+    const span = document.createElement('span')
+    span.textContent = name
+    label.appendChild(span)
+    filters.appendChild(label)
+    chks.push(chk)
+    filters.appendChild(document.createElement('br'))
+  }
+  return chks
+}
 
 import util from './util.mjs'
 
 const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
 
-const makeTimeTable = function(data, chks, chks2) {
+const makeTimeTable = function(data, chks, chks2, chkslang) {
   const weeks = '月火水木金'
   const nhour = 4
   const nfree = 4
@@ -127,6 +176,13 @@ const makeTimeTable = function(data, chks, chks2) {
       if (sname == chk.value && !chk.checked)
         continue A
     }
+    // chklang
+    const lang = d['言語'] || '日本語'
+    for (const c of chkslang) {
+      if (lang.indexOf(c.value) >= 0 && !c.checked)
+        continue A
+    }
+
 
     // chks
     const type = d['科目']
@@ -159,14 +215,14 @@ const makeTimeTable = function(data, chks, chks2) {
     if (cnt[type] <= limit)
       items.push(d)
   }
-  console.log(items.length)
+  //console.log(items.length)
   for (let i = items.length; i < nhour * weeks.length; i++) {
     items.push(null)
   }
   for (let i = 0; i < nfree; i++) {
     items[util.rnd(items.length)] = null
   }
-  console.log(items)
+  //console.log(items)
 
   const c = document.createElement('div')
   c.className = 'timetable'
@@ -298,6 +354,7 @@ a {
 <div id='filters'>
 <div id='filters1'></div>
 <div id='filters2'></div>
+<div id='filters3'></div>
 </div>
 
 <div id="link">

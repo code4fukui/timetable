@@ -28,6 +28,7 @@ const main = async function() {
     for (const a of items) {
       const d2 = copyJSON(d)
       setJSON(d2, a)
+      delete d2['備考']
       data.push(d2)
     }
   }
