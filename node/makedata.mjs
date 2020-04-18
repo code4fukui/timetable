@@ -12,7 +12,7 @@ const main = async function() {
   for (const item of list) {
     const items = await util.fetchCSVtoJSON(item.URL)
     if (item.URL.startsWith('https://docs.google.com/')) {
-      const fn = 'spreadsheet/' + item['教材ID']
+      const fn = 'spreadsheet/data' + item['教材ID']
       util.writeCSV(path + fn, util.json2csv(items))
       item.URL = baseurl + fn + '.csv'
     }
