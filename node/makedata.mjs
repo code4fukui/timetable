@@ -1,41 +1,33 @@
-import util from './util.js'
-//import util from './util.mjs'
-import fetch from 'node-fetch'
+import util from './util.mjs'
 
-const URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdsFYLU6roC8Y-PB-7MSJxxVByBh-fQxpa-Bcf0Hatykrv8M20ZQ0NAwFF5MBjw7qTZ2NnKRNEBNeP/pub?gid=0&single=true&output=csv'
-
-
-const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
-const copyJSON = d => JSON.parse(JSON.stringify(d))
-const setJSON = function(dst, src) {
-  for (const name in src) {
-    dst[name] = src[name]
-  }
-  return dst
-}
 const main = async function() {
-  const url = URL
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdsFYLU6roC8Y-PB-7MSJxxVByBh-fQxpa-Bcf0Hatykrv8M20ZQ0NAwFF5MBjw7qTZ2NnKRNEBNeP/pub?gid=0&single=true&output=csv'
   const path = '../data/'
+  const baseurl = 'https://code4fukui.github.io/timetable/data/'
 
   const fn = 'funs'
 
-  const list = await fetchCSVtoJSON(url)
-  util.writeCSV(path + 'index', util.json2csv(list))
+  const list = await util.fetchCSVtoJSON(url)
   const data = []
   for (const item of list) {
-    const items = await fetchCSVtoJSON(item.URL)
-    const d = setJSON({}, item)
+    const items = await util.fetchCSVtoJSON(item.URL)
+    if (item.URL.startsWith('https://docs.google.com/')) {
+      const fn = 'spreadsheet/' + item['教材ID'] + '.csv'
+      util.writeCSV(path + fn, util.json2csv(items))
+      item.URL = baseurl + fn
+    }
+    const d = util.setJSON({}, item)
     for (const a of items) {
-      const d2 = copyJSON(d)
-      setJSON(d2, a)
+      const d2 = util.copyJSON(d)
+      util.setJSON(d2, a)
       delete d2['備考']
       data.push(d2)
     }
   }
   console.log(data)
+  util.writeCSV(path + 'index', util.json2csv(list))
   util.writeCSV(path + fn, util.json2csv(data))
 }
 if (process.argv[1].endsWith('/makedata.mjs')) {
   main()
-} else {
 }

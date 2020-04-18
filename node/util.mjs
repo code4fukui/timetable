@@ -458,6 +458,14 @@ exports.splitString = function(s, splitters) {
     res.push(s.substring(n))
   return res
 }
+exports.fetchCSVtoJSON = async url => exports.csv2json(exports.decodeCSV(await (await fetch(url)).text()))
+exports.copyJSON = d => JSON.parse(JSON.stringify(d))
+exports.setJSON = function(dst, src) {
+  for (const name in src) {
+    dst[name] = src[name]
+  }
+  return dst
+}
 
 if (process.argv[1].endsWith('/util.mjs')) {
   for (let i = 0; i < this.JAPAN_PREF.length; i++) {
