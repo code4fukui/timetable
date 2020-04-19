@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
-import util from './util.js'
-//import util from './util.mjs'
+//import util from './util.js'
+import util from './util.mjs'
 import fs from 'fs'
 import fetch from 'node-fetch'
 
@@ -98,7 +98,7 @@ const make = async function() {
 const writeCSVbyJSON = function(fn, json) {
   fs.writeFileSync(fn, util.addBOM(util.encodeCSV(util.json2csv(json))))
 }
-const main = async function() {
+const fetchAll = async function() {
   const path = './'
   const fnindex = 'fukuicedjp2.csv'
   const fnindexdst = 'fukuicedjp3.csv'
@@ -149,6 +149,17 @@ const main = async function() {
   console.log(list)
   //writeCSVbyJSON(path + fnindexdst, list)
   writeCSVbyJSON('../data/fukuicedjp.csv', list)
+}
+const main = async function() {
+  //fetchAll()
+  const data = util.csv2json(util.readCSV('../data/fukuicedjp'))
+  for (const d of data) {
+    for (const name in d) {
+      d[name] = d[name].replace(/\s+/g, ' ')
+    }
+  }
+  writeCSVbyJSON('../data/fukuicedjp2.csv', data)
+  console.log(data)
 }
 if (process.argv[1].endsWith('/fukuicedjp.mjs')) {
   main()
