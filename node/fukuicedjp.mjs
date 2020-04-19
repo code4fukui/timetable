@@ -157,6 +157,7 @@ const main = async function() {
     for (const name in d) {
       d[name] = d[name].replace(/\s+/g, ' ')
     }
+    d.URL = d.URL.replace(/\s/g, "")
   }
   writeCSVbyJSON('../data/fukuicedjp2.csv', data)
   console.log(data)
