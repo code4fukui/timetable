@@ -160,8 +160,6 @@ const makeLanguageFilter = function(filters, langs) {
 
 import util from './util.mjs'
 
-const fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await (await fetch(url)).text()))
-
 const makeTimeTable = function(data, chks, chks2, chkslang) {
   const weeks = '月火水木金'
   const nhour = 4
@@ -377,7 +375,7 @@ a {
 </div>
 
 <div id="src">
-DATA: CC BY  <a href=https://fukuno.jig.jp/>福野泰介</a>「<a href=https://fukuno.jig.jp/2823>学生Youtuber活躍! 大人も学ぶ、多言語で学ぶ</a> / <a href=https://fukuno.jig.jp/2820>時間割ガチャ - 教材オープンデータあつめ始めました</a>」 <a href=data/funs.csv>CSV</a> / <a href=data/funs.json>JSON</a><br>
+DATA: CC BY  <a href=https://fukuno.jig.jp/>福野泰介</a>「<a href=https://fukuno.jig.jp/2823>学生YouTuber活躍! 大人も学ぶ、多言語で学ぶ</a> / <a href=https://fukuno.jig.jp/2820>時間割ガチャ - 教材オープンデータあつめ始めました</a>」 <a href=data/funs.csv>CSV</a> / <a href=data/funs.json>JSON</a><br>
 Educatino Materials: <span id='materials'></span><br>
 APP：CC BY <a href='https://fukuno.jig.jp/2820'>fukuno.jig.jp</a> <a href=https://github.com/code4fukui/timetable/>src on GitHub</a><br>
 </div>
