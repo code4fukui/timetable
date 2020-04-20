@@ -1,6 +1,5 @@
 import cheerio from 'cheerio'
-import util from './util.js'
-//import util from './util.mjs'
+import util from './util.mjs'
 import fs from 'fs'
 import fetch from 'node-fetch'
 
