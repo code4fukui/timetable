@@ -228,11 +228,18 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
   const c = document.createElement('div')
   c.className = 'timetable'
   c.style.display = 'grid'
-  c.style.gridTemplateColumns = `repeat(6, 1fr)`
+  c.style.gridTemplateColumns = `.2fr 1fr 1fr 1fr 1fr 1fr`
   //c.style.gridTemplateRows = `.1 1f 1f 1f 1f 1f 1f`
-  c.appendChild(document.createElement('span'))
+  const dummy = document.createElement('span')
+  dummy.style.borderTop = 'none'
+  dummy.style.borderLeft = 'none'
+  c.appendChild(dummy)
   for (const day of weeks) {
     const div = document.createElement('span')
+    div.style.fontSize = '120%'
+    div.style.fontWeight = 'bold'
+    div.style.backgroundColor = 'var(--main-color)'
+    div.style.color = 'white'
     c.appendChild(div)
     div.textContent = day
   }
@@ -242,6 +249,12 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
     if (i % 5 == 0) {
       const span = document.createElement('span')
       span.textContent = i / 5 + 1
+      span.style.fontSize = '150%'
+      span.style.display = 'flex'
+      span.style.alignItems = 'center'
+      span.style.justifyContent = 'center'
+      span.style.backgroundColor = 'var(--main-color)'
+      span.style.color = 'white'
       c.appendChild(span)
     }
     const div = document.createElement('span')
@@ -290,15 +303,15 @@ h2 {
 /* tabular map */
 .timetablec {
   display: inline-block;
-  width: 90vw;
+  width: 95vw;
   text-align: center;
 }
 .timetable {
   margin: 1em auto;
 }
 .timetable > span {
-  border: .4vw solid gray;
-  margin: 0 -.4vw -.4vw 0;
+  border: .2vw solid #aaa;
+  margin: 0 -.2vw -.2vw 0;
   padding: .4vh 0.2vw;
   font-size: 90%;
 }
