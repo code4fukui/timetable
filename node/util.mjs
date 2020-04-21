@@ -1,10 +1,11 @@
 import fs from 'fs'
 import fetch from 'node-fetch'
 import iconv from 'iconv-lite'
+import cheerio from 'cheerio'
 
-const exports = {}
+const util = {}
 
-exports.simplejson2txt = function(json) {
+util.simplejson2txt = function(json) {
   if (typeof json == 'string') {
     json = JSON.parse(json)
   }
@@ -17,7 +18,8 @@ exports.simplejson2txt = function(json) {
   res.push('')
   return res.join('\r\n')
 }
-exports.decodeCSV = function(s) {
+
+util.decodeCSV = function(s) {
 	const res = []
 	let st = 0
 	let line = []
@@ -88,7 +90,7 @@ exports.decodeCSV = function(s) {
 	return res
 }
 
-exports.encodeCSV = function(csvar) {
+util.encodeCSV = function(csvar) {
   let s = []
   for (let i = 0; i < csvar.length; i++) {
     let s2 = []
@@ -109,9 +111,23 @@ exports.encodeCSV = function(csvar) {
   }
   return s.join('\n')
 }
-exports.csv2json = function(csv) {
+util.csv2json = function(csv) {
 	const res = []
 	const head = csv[0]
+	for (let i = 0; i < head.length; i++) {
+		const h = head[i]
+		const n = h.indexOf('(')
+		const m = h.indexOf('（')
+		let l = -1
+		if (n == -1) {
+			l = m
+		} else if (m == -1) {
+			l = n
+		} else {
+			l = Math.min(n, m)
+		}
+		head[i] = (l > 0 ? h.substring(0, l) : h).trim()
+	}
 	for (let i = 1; i < csv.length; i++) {
 		const d = {}
 		for (let j = 0; j < head.length; j++) {
@@ -121,7 +137,7 @@ exports.csv2json = function(csv) {
 	}
 	return res
 }
-exports.json2csv = function(json) {
+util.json2csv = function(json) {
   if (!Array.isArray(json)) {
     throw 'is not array! at json2csv'
   }
@@ -148,10 +164,10 @@ exports.json2csv = function(json) {
   }
   return res
 }
-exports.addBOM = function(s) {
+util.addBOM = function(s) {
   return '\ufeff' + s
 }
-exports.writeCSV = function(fnbase, csvar) {
+util.writeCSV = function(fnbase, csvar) {
   const s = this.encodeCSV(csvar)
   //const bom = new Uint8Array([ 0xEF, 0xBB, 0xBF ]) // add BOM
   //fs.writeFileSync(fnbase + '.csv', bom)
@@ -159,7 +175,7 @@ exports.writeCSV = function(fnbase, csvar) {
   //fs.writeFileSync(fnbase + '.sjis.csv', iconv.encode(s, 'ShiftJIS'))
   fs.writeFileSync(fnbase + '.json', JSON.stringify(this.csv2json(csvar)))
 }
-exports.readCSV = function(fnbase) {
+util.readCSV = function(fnbase) {
   try {
     let data = fs.readFileSync(fnbase + '.csv', 'utf-8')
     if (data.charCodeAt(0) == 0xfeff) {
@@ -173,49 +189,61 @@ exports.readCSV = function(fnbase) {
     return this.json2csv(json)
   }
 }
-exports.fix0 = function(n, beam) {
+util.readJSONfromCSV = function(fn) {
+  try {
+    let data = fs.readFileSync(fn, 'utf-8')
+    if (data.charCodeAt(0) == 0xfeff) {
+      data = data.substring(1)
+    }
+    const csv = this.decodeCSV(data)
+    return this.csv2json(csv)
+  } catch (e) {
+    console.log(e)
+    return []
+  }
+}
+util.writeCSVfromJSON = function(fn, json) {
+  const csv = this.json2csv(json)
+  const data = this.addBOM(this.encodeCSV(csv))
+  this.writeFileSync(fn, data, 'utf-8')
+}
+util.fix0 = function(n, beam) {
   const s = "000000000" + n
   return s.substring(s.length - beam)
 }
-exports.formatYMDHMS = function(t) {
-  if (!t)
-    t = new Date()
-  const fix0 = exports.fix0
+util.formatYMDHMS = function(t) {
+  const fix0 = util.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2) + "T" + fix0(t.getHours(), 2) + ":" + fix0(t.getMinutes(), 2) + ":" + fix0(t.getSeconds(), 2)
 }
-exports.formatYMD = function(t) {
-  if (!t)
-    t = new Date()
-  const fix0 = exports.fix0
+util.formatYMD = function(t) {
+  const fix0 = util.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2)
 }
-exports.getYMDHMS = function() {
+util.getYMDHMS = function() {
   const t = new Date()
-  const fix0 = exports.fix0
+  const fix0 = util.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2) + fix0(t.getHours(), 2) + fix0(t.getMinutes(), 2) + fix0(t.getSeconds(), 2)
 }
-exports.getYMDH = function() {
+util.getYMDH = function() {
   const t = new Date()
-  const fix0 = exports.fix0
+  const fix0 = util.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2) + fix0(t.getHours(), 2)
 }
-exports.getYMD = function() {
+util.getYMD = function() {
   const t = new Date()
-  const fix0 = exports.fix0
+  const fix0 = util.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2)
 }
-exports.cutNoneN = function(s) {
-  s = exports.toHalf(s)
+util.cutNoneN = function(s) {
+  s = util.toHalf(s)
   const n = parseInt(s.replace(/[^\d]/g, ""))
   if (isNaN(n))
     return 0
   return n
 }
-exports.toHalf = function(s) {
-  if (s === undefined || s === null)
-    return s
-  const ZEN = "０１２３４５６７８９（）／"
-  const HAN = "0123456789()/"
+util.toHalf = function(s) {
+  const ZEN = "０１２３４５６７８９（）／ー！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+  const HAN = "0123456789()/-!&: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   let s2 = ""
   for (let i = 0; i < s.length; i++) {
     const c = s.charAt(i)
@@ -228,7 +256,7 @@ exports.toHalf = function(s) {
   }
   return s2
 }
-exports.toHalfNumber = function(s) {
+util.toHalfNumber = function(s) {
   const ZEN = "０１２３４５６７８９"
   const HAN = "0123456789"
   let s2 = ""
@@ -243,7 +271,7 @@ exports.toHalfNumber = function(s) {
   }
   return s2
 }
-exports.mkdirSyncForFile = function(fn) {
+util.mkdirSyncForFile = function(fn) {
   const dirs = fn.split('/')
   let dir = ""
   for (let i = 0; i < dirs.length - 1; i++) {
@@ -254,11 +282,11 @@ exports.mkdirSyncForFile = function(fn) {
     }
   }
 }
-exports.writeFileSync = function(fn, data, enc) {
+util.writeFileSync = function(fn, data, enc) {
   this.mkdirSyncForFile(fn)
   fs.writeFileSync(fn, data, enc)
 }
-exports.getExtFromURL = function(url) {
+util.getExtFromURL = function(url) {
   let ext = ".txt"
   const n = url.lastIndexOf('/')
   const webfn = url.substring(n)
@@ -268,7 +296,7 @@ exports.getExtFromURL = function(url) {
   }
   return ext
 }
-exports.getHistogram = function(s) {
+util.getHistogram = function(s) {
   const chs = {}
   for (const c of s) {
     if (!chs[c.charCodeAt(0)])
@@ -283,15 +311,7 @@ exports.getHistogram = function(s) {
   ar.sort((a, b) => b[1] - a[1])
   return ar
 }
-exports.fetchText = async function(url, enc) {
-  if (!enc) {
-    return await (await fetch(url)).text()
-  }
-  const abuf = await (await fetch(url)).arrayBuffer()
-  var buf = new Buffer.from(abuf, 'binary')
-  return iconv.decode(buf, enc)
-}
-exports.fetchTextWithLastModified = async function(url, enc, debug) {
+util.fetchTextWithLastModified = async function(url, enc, debug) {
   const res = await fetch(url)
   let lastUpdate = null
   if (res.status != 200)
@@ -316,164 +336,94 @@ exports.fetchTextWithLastModified = async function(url, enc, debug) {
   const buf = new Buffer.from(abuf, 'binary')
   return [ iconv.decode(buf, enc), lastUpdate ]
 }
-exports.getWebWithCache = async function(url, path, cachetime, enc) {
-  const ext = exports.getExtFromURL(url)
-  const fnlatest = path + "_latest" + ext
-  const fn = path + exports.getYMDHMS() + ext
-  let cache = null
-  //console.log(fn, cachetime)
-  try {
-    const modtime = fs.statSync(fnlatest).mtime
-    const dt = new Date().getTime() - new Date(modtime).getTime()
-    //console.log(dt, new Date(modtime).getTime(), new Date().getTime())
-    cache = fs.readFileSync(fnlatest, 'utf-8')
-    if (!cachetime || dt < cachetime) {
-      //console.log("use cache")
-      return cache
-    }
-  } catch (e) {
-  }
-  let data = null
-  try {
-    data = await exports.fetchText(url, enc)
-  } catch (e) {
-    console.log(e)
-  }
-  if (data == cache) {
-    //console.log("same as cache")
-    //fs.writeFileSync(fnlatest, data)
-    return cache
-  }
-  //console.log("use original")
-  try {
-    fs.writeFileSync(fnlatest, data)
-    fs.writeFileSync(fn, data)
-  } catch (e) {
-    exports.mkdirSyncForFile(fn)
-    fs.writeFileSync(fnlatest, data)
-    fs.writeFileSync(fn, data)
-  }
-  //console.log("write", fn)
-  return data
-}
-exports.getCache = async function(asyncfetch, path, ext, cachetime) {
-  const fnlatest = path + "_latest" + ext
-  const fn = path + exports.getYMDHMS() + ext
-  let cache = null
-  //console.log(fn, cachetime)
-  try {
-    const modtime = fs.statSync(fnlatest).mtime
-    const dt = new Date().getTime() - new Date(modtime).getTime()
-    //console.log(dt, new Date(modtime).getTime(), new Date().getTime())
-    cache = fs.readFileSync(fnlatest, 'utf-8')
-    if (!cachetime || dt < cachetime) {
-      //console.log("use cache")
-      return cache
-    }
-  } catch (e) {
-  }
-  let data = null
-  try {
-    data = await asyncfetch()
-  } catch (e) {
-    console.log('asyncfetch err', e)
-  }
-  if (!data) {
-    //console.log("can't fetch or convert")
-    return cache
-  }
-  if (data == cache) {
-    //console.log("same as cache")
-    //fs.writeFileSync(fnlatest, data)
-    return cache
-  }
-  //console.log("use original")
-  try {
-    fs.writeFileSync(fnlatest, data)
-    fs.writeFileSync(fn, data)
-  } catch (e) {
-    exports.mkdirSyncForFile(fn)
-    fs.writeFileSync(fnlatest, data)
-    fs.writeFileSync(fn, data)
-  }
-  //console.log("write", fn)
-  return data
-}
-exports.getLastUpdateOfCache = function(url, path) {
-  const fnlatest = path + "_latest" + exports.getExtFromURL(url)
-  try {
-    const modtime = fs.statSync(fnlatest).mtime
-    const d = new Date(modtime)
-    return exports.formatYMDHMS(d)
-  } catch (e) {
-  }
-  return null
+util.fetchText = async function(url, enc) {
+  const [ text, lastUpdate ] = await this.fetchTextWithLastModified(url, enc)
+  return text
 }
 
-exports.JAPAN_PREF = [ "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県" ]
-exports.JAPAN_PREF_EN = [ "Hokkaido", "Aomori", "Iwate", "Miyagi", "Akita", "Yamagata", "Fukushima", "Ibaraki", "Tochigi", "Gunma", "Saitama", "Chiba", "Tokyo", "Kanagawa", "Niigata", "Toyama", "Ishikawa", "Fukui", "Yamanashi", "Nagano", "Gifu", "Shizuoka", "Aichi", "Mie", "Shiga", "Kyoto", "Osaka", "Hyogo", "Nara", "Wakayama", "Tottori", "Shimane", "Okayama", "Hiroshima", "Yamaguchi", "Tokushima", "Kagawa", "Ehime", "Kochi", "Fukuoka", "Saga", "Nagasaki", "Kumamoto", "Oita", "Miyazaki", "Kagoshima", "Okinawa" ]
-
-exports.makeURL = function(url, relurl) {
-  if (relurl.startsWith("http://") || relurl.startsWith("https://"))
-    return relurl
-  if (relurl.indexOf("..") >= 0) {
-    throw "not supported '..' utils.makeURL"
-  }
-  if (relurl.startsWith('/')) {
-    const n = url.indexOf('/', 8)
-    if (n >= 0)
-      url = url.substring(0, n)
-    return url + relurl
-  }
-  const n = url.substring(8).lastIndexOf('/')
-  if (n < 0)
-    return url + "/" + relurl
-  return url.substring(0, n + 8 + 1) + relurl
-}
-exports.test = function(t1, t2) {
-  if (t1 == t2)
-    return
-  console.log(t1, t2)
-  throw 'err on util.test'
-}
-const test = async function() {
-  console.log(exports.formatYMDHMS(new Date()))
-  exports.test(exports.makeURL('http://sabae.cc/', 'test.html'), 'http://sabae.cc/test.html')
-  exports.test(exports.makeURL('https://sabae.cc/', 'test.html'), 'https://sabae.cc/test.html')
-  exports.test(exports.makeURL('https://sabae.cc', 'test.html'), 'https://sabae.cc/test.html')
-  exports.test(exports.makeURL('https://sabae.cc/', 'https://jig.jp/'), 'https://jig.jp/')
-  exports.test(exports.makeURL('https://sabae.cc/abc/test.html', '/img/'), 'https://sabae.cc/img/')
-}
-
-exports.splitString = function(s, splitters) {
+// parse HTML
+util.parseTagsFromHTML = function(html, tag, key) {
+  const dom = cheerio.load(html)
   const res = []
-  let n = 0
-  for (let i = 0; i < s.length; i++) {
-    const c = s.charAt(i)
-    if (splitters.indexOf(c) >= 0) {
-      if (i > n)
-        res.push(s.substring(n, i))
-      n = i + 1
-    }
-  }
-  if (n < s.length)
-    res.push(s.substring(n))
+  dom(tag).each((idx, ele) => {
+    const text = dom(ele).text()
+    if (!key || text.indexOf(key) >= 0)
+      res.push(text)
+  })
   return res
 }
-exports.fetchCSVtoJSON = async url => exports.csv2json(exports.decodeCSV(await (await fetch(url)).text()))
-exports.copyJSON = d => JSON.parse(JSON.stringify(d))
-exports.setJSON = function(dst, src) {
+util.parseTablesFromHTML = function(html) {
+  const dom = cheerio.load(html)
+  const tbl = []
+  const extract = function(ele) {
+    const atag = dom('a', null, ele)
+    if (!atag)
+      return dom(ele).text().trim()
+    return dom(atag[0]).attr('href')
+  }
+  const tbls = []
+  dom('table', null, null).each((idx, div) => {
+    const lines = []
+    dom('tr', null, div).each((idx, dl) => {
+      const line = []
+      dom('th', null, dl).each((idx, ele) => line.push(extract(ele)))
+      dom('td', null, dl).each((idx, ele) => line.push(extract(ele)))
+      lines.push(line)
+    })
+    tbls.push(lines)
+  })
+  return tbls
+}
+util.parseDLsFromHTML = function(html) {
+  const dom = cheerio.load(html)
+  const tbl = []
+  const extract = function(ele) {
+    const ch = dom(ele).children()
+    if (ch.length == 0)
+      return dom(ele).text()
+    const c = ch[0]
+    console.log(c)
+    if (c.type == 'tag' && c.name == 'iframe') {
+      return dom(c).attr('src')
+    }
+    //process.exit(0)
+    return dom(ele).text()
+  }
+  const tbls = []
+  dom('div', null, null).each((idx, div) => {
+    const lines = []
+    dom('dl', null, div).each((idx, dl) => {
+      const line = []
+      dom('dt', null, dl).each((idx, ele) => line.push(extract(ele)))
+      dom('dd', null, dl).each((idx, ele) => line.push(extract(ele)))
+      lines.push(line)
+    })
+    tbls.push(lines)
+  })
+  return tbls
+}
+util.fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await util.fetchText(url)))
+util.sleep = async msec => new Promise(resolve => setTimeout(resolve, msec))
+util.copyJSON = d => JSON.parse(JSON.stringify(d))
+util.setJSON = function(dst, src) {
   for (const name in src) {
     dst[name] = src[name]
   }
   return dst
 }
 
+const main = async function() {
+  
+}
 if (process.argv[1].endsWith('/util.mjs')) {
-  for (let i = 0; i < this.JAPAN_PREF.length; i++) {
-    console.log((i + 1) + '\t' + this.JAPAN_PREF[i] + "\t" + this.JAPAN_PREF_EN[i])
-  }
+  main()
+  /*
+  const test = [ [ '"abc"', '"', '""', '"""', 'a""b' ] ]
+  const enc = util.encodeCSV(test)
+  console.log(enc)
+  const dec = util.decodeCSV(enc)
+  console.log(dec)
+  */
 }
 
-export default exports
-
+export default util
