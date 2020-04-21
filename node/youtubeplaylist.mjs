@@ -105,6 +105,26 @@ const normalizeType = function(s) {
   return s
 }
 
+const filterKojima = function(stitle) {
+  const ss = util.splitString(stitle, ' 　「」')
+  let target = '小学生'
+  let type = ''
+  if (ss[0].startsWith('小')) {
+    target = '小学' + ss[0].charAt(1) + "年"
+    if (ss[0].length == 2) {
+      type = ss[1]
+      stitle = ss[2]
+    } else {
+      type = ss[0].substring(2)
+      stitle = ss[1]
+    }
+  }
+  return {
+    '対象': target,
+    '科目': normalizeType(type),
+    'タイトル': stitle,
+  }
+}
 const filterSaitama = function(stitle) {
   let target, type, title
   if (stitle.startsWith('特別支援')) {
@@ -194,6 +214,7 @@ const makeCSV = async function(type, listid, name, filter) {
   //const fnindex = 'index.csv'
   console.log(list)
   const scsv = util.addBOM(util.encodeCSV(util.json2csv(list)))
+  util.mkdirSyncForFile(path)
   fs.writeFileSync(path + dt + '.csv', scsv, 'utf-8')
   fs.writeFileSync(path + 'index.csv', scsv, 'utf-8')
 }
@@ -211,8 +232,9 @@ const main = async function() {
   return
   */
   const contents = [
-    { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
-    //{ name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
+    // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
+    // { name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
+    { name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
   ]
   for (const c of contents) {
     await makeCSV(c.type, c.id, c.name, c.filter)

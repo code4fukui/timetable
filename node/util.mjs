@@ -212,6 +212,8 @@ exports.cutNoneN = function(s) {
   return n
 }
 exports.toHalf = function(s) {
+  if (s === undefined || s === null)
+    return s
   const ZEN = "０１２３４５６７８９（）／"
   const HAN = "0123456789()/"
   let s2 = ""

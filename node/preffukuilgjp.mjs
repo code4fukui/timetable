@@ -106,8 +106,23 @@ const main = async function() {
       }
     }
   }
+  const head = [ '科目', 'タイトル', 'URL', '対象', '公開日' ]
+  tbl.unshift(head)
+  const json = util.csv2json(tbl)
+  for (const d of json) {
+    const type = util.toHalf(d['科目'])
+    const n = type.match(/(\d+)/)[1]
+    d.No = n
+    const idx = type.indexOf('(')
+    if (idx >= 0) {
+      d['科目'] = type.substring(0, idx)
+    }
+
+    d['対象'] = util.toHalf(d['対象'])
+  }
+  const tbl2 = util.json2csv(json)
   //fs.writeFileSync(path + fnindex, util.addBOM(util.encodeCSV(util.json2csv(tbl))))
-  fs.writeFileSync(path + fnindex, util.addBOM(util.encodeCSV(tbl)))
+  fs.writeFileSync(path + fnindex, util.addBOM(util.encodeCSV(tbl2)))
 
   /*
   if (tbls.length > 0 ) {
