@@ -8,8 +8,11 @@ const makeData = async function() {
   const fn = 'funs'
 
   const list = await util.fetchCSVtoJSON(url)
+  util.writeCSV(path + 'index', util.json2csv(list))
+
   const data = []
   for (const item of list) {
+    console.log(item.URL)
     const gdoc = item.URL.startsWith('https://docs.google.com/') && item.URL.endsWith('=csv')
     if (item.URL.endsWith('.csv') || gdoc) {
       const items = await util.fetchCSVtoJSON(item.URL)
@@ -35,7 +38,6 @@ const makeData = async function() {
     }
   }
   console.log(data.length)
-  util.writeCSV(path + 'index', util.json2csv(list))
   util.writeCSV(path + fn, util.json2csv(data))
 }
 const main = async function() {

@@ -110,7 +110,7 @@ const filterKojima = function(stitle) {
   let target = '小学生'
   let type = ''
   if (ss[0].startsWith('小')) {
-    target = '小学' + ss[0].charAt(1) + "年"
+    target = '小学' + util.toHalf(ss[0]).charAt(1) + "年"
     if (ss[0].length == 2) {
       type = ss[1]
       stitle = ss[2]
@@ -186,6 +186,21 @@ const filterJA = function(stitle) {
     'タイトル': stitle,
   }
 }
+const filterPCNMiyazaki = function(stitle) {
+  const n = stitle.indexOf(' ')
+  let no = ''
+  if (n >= 0) {
+    no = parseInt(stitle)
+    stitle = stitle.substring(n + 1)
+  }
+  return {
+    '対象': '小中学生',
+    '言語': '英語版',
+    '科目': 'プログラミング',
+    'No': no,
+    'タイトル': stitle,
+  }
+}
 
 const makeCSV = async function(type, listid, name, filter) {
   const path = '../data/' + name + "/"
@@ -257,9 +272,10 @@ const main = async function() {
     // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
 
     //{ name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
-    //{ name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
+    { name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
+    { name: 'pcnmiyazaki', type: 'playlist', id: 'PLEELZXgkDttSIaLQNZxLwu9OirMD4hFOX', filter: filterPCNMiyazaki },
 
-    { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
+    // { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
 
   ]
   for (const c of contents) {
