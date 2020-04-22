@@ -212,10 +212,14 @@ util.fix0 = function(n, beam) {
   return s.substring(s.length - beam)
 }
 util.formatYMDHMS = function(t) {
+  if (!t)
+    t = new Date()
   const fix0 = util.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2) + "T" + fix0(t.getHours(), 2) + ":" + fix0(t.getMinutes(), 2) + ":" + fix0(t.getSeconds(), 2)
 }
 util.formatYMD = function(t) {
+  if (!t)
+    t = new Date()
   const fix0 = util.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2)
 }
@@ -242,6 +246,8 @@ util.cutNoneN = function(s) {
   return n
 }
 util.toHalf = function(s) {
+  if (s === null || s === undefined)
+    return s
   const ZEN = "０１２３４５６７８９（）／ー！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
   const HAN = "0123456789()/-!&: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   let s2 = ""

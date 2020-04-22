@@ -10,24 +10,31 @@ const makeData = async function() {
   const list = await util.fetchCSVtoJSON(url)
   const data = []
   for (const item of list) {
-    const items = await util.fetchCSVtoJSON(item.URL)
-    if (item.URL.startsWith('https://docs.google.com/')) {
-      const fn = 'spreadsheet/data' + item['教材ID']
-      util.writeCSV(path + fn, util.json2csv(items))
-      item.URL = baseurl + fn + '.csv'
-    }
-    //const d = util.setJSON({}, item)
-    let cnt = 0
-    for (const a of items) {
-      const d2 = util.copyJSON(item)
-      util.setJSON(d2, a)
-      delete d2['備考']
-      data.push(d2)
-      if (cnt++ < 3)
-        console.log(d2)
+    const gdoc = item.URL.startsWith('https://docs.google.com/') && item.URL.endsWith('=csv')
+    if (item.URL.endsWith('.csv') || gdoc) {
+      const items = await util.fetchCSVtoJSON(item.URL)
+      if (gdoc) {
+        const fn = 'spreadsheet/data' + item['教材ID']
+        util.writeCSV(path + fn, util.json2csv(items))
+        item.URL = baseurl + fn + '.csv'
+      }
+      //const d = util.setJSON({}, item)
+      let cnt = 0
+      for (const a of items) {
+        const d2 = util.copyJSON(item)
+        util.setJSON(d2, a)
+        delete d2['備考']
+        data.push(d2)
+        if (cnt++ < 3)
+          console.log(d2)
+      }
+    } else {
+      delete item['備考']
+      data.push(item)
+      console.log(data)
     }
   }
-  //console.log(data)
+  console.log(data.length)
   util.writeCSV(path + 'index', util.json2csv(list))
   util.writeCSV(path + fn, util.json2csv(data))
 }

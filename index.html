@@ -123,6 +123,11 @@ const makeContentsFilter = function(filters, data, materials) {
       materials.appendChild(span)
     }
   }
+  const allchk = document.createElement('label')
+  allchk.textContent = 'すべての教材'
+  filters.appendChild(allchk)
+  filters.appendChild(document.createElement('br'))
+
   const chks = []
   for (const name of list) {
     //console.log(name)
@@ -138,6 +143,20 @@ const makeContentsFilter = function(filters, data, materials) {
     filters.appendChild(label)
     chks.push(chk)
     filters.appendChild(document.createElement('br'))
+  }
+  allchk.chks = chks
+  allchk.onclick = function() {
+    let flg = false
+    for (const chk of this.chks) {
+      if (chk.checked) {
+        flg = true
+        break
+      }
+    }
+    for (const chk of this.chks) {
+      chk.checked = !flg
+    }
+    this.chks[0].onclick()
   }
   return chks
 }
@@ -328,6 +347,9 @@ h2 {
 }
 #filters > div {
   vertical-align: top;
+  text-align: left;
+  height: 10em;
+  overflow-y: auto;
   display: inline-block;
   margin: 1em;
   padding: .5em;
