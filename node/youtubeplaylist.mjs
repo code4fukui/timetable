@@ -4,11 +4,12 @@ import fetch from 'node-fetch'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const fetchYouTubePlaylist = async function(playlistid) {
+const fetchYouTubePlaylist = async function(playlistid, pageToken) {
   const part = 'snippet'
   //const part = 'contentDetails'
   //const part = 'status'
-  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistid}&maxResults=50&key=${process.env.YOUTUBE_API_KEY}`
+  const spagetoken = pageToken ? "&pageToken=" + pageToken : ""
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=${part}&playlistId=${playlistid}&maxResults=50&key=${process.env.YOUTUBE_API_KEY}` + spagetoken
   const json = await (await fetch(url)).json()
   return json
 }
@@ -45,6 +46,22 @@ const parseDuration = function(duration) {
   num = duration.match(/PT(\d+)H(\d+)M(\d+)S/) // PT1H12M27S
   if (num) {
     return fix0(num[1], 2) + ':' + fix0(num[2], 2) + ':' + fix0(num[3], 2)
+  }
+  num = duration.match(/PT(\d+)H(\d+)M/) // PT1H12M
+  if (num) {
+    return fix0(num[1], 2) + ':' + fix0(num[2], 2) + ':00'
+  }
+  num = duration.match(/PT(\d+)H(\d+)S/) // PT1H27S
+  if (num) {
+    return fix0(num[1], 2) + ':00:' + fix0(num[2], 2)
+  }
+  num = duration.match(/PT(\d+)H/) // PT15H
+  if (num) {
+    return fix0(num[1], 2) + '00:00'
+  }
+  num = duration.match(/PT(\d+)M/) // PT15M
+  if (num) {
+    return '00:' + fix0(num[1], 2) + ':00'
   }
   console.log('parse err', duration)
   return null
@@ -221,11 +238,12 @@ const filterColumbiaMusic = function(stitle) {
 const makeCSV = async function(type, listid, name, filter) {
   const path = '../data/' + name + "/"
   let data = null
+  let pid = listid
   if (type == 'playlist') {
     data = await fetchYouTubePlaylist(listid)
   } else if (type == 'channel') {
     data = await fetchYouTubeChannel(listid)
-    const pid = data.items[0].contentDetails.relatedPlaylists.uploads // UU_ZMXFvvu-YWEbk0wK79jhw
+    pid = data.items[0].contentDetails.relatedPlaylists.uploads // UU_ZMXFvvu-YWEbk0wK79jhw
     data = await fetchYouTubePlaylist(pid)
     /*
     console.log(data)
@@ -238,25 +256,33 @@ const makeCSV = async function(type, listid, name, filter) {
   }
 
   const list = []
-  const videoids = []
-  for (const d of data.items) {
-    const s = d.snippet
-    if (!s.thumbnails) // private video
-      continue
-    console.log(s)
-    const o = filter(s.title)
-    if (!o)
-      continue
-    const videoid = s.resourceId.videoId
-    o['公開日'] = s.publishedAt
-    o.URL = 'https://www.youtube.com/watch?v=' + videoid
-    list.push(o)
-    videoids.push(videoid)
+  let nlist = 0
+  for (;;) {
+    const videoids = []
+    for (const d of data.items) {
+      const s = d.snippet
+      if (!s.thumbnails) // private video
+        continue
+      console.log(s)
+      const o = filter(s.title)
+      if (!o)
+        continue
+      const videoid = s.resourceId.videoId
+      o['公開日'] = s.publishedAt
+      o.URL = 'https://www.youtube.com/watch?v=' + videoid
+      list.push(o)
+      videoids.push(videoid)
+    }
+    const duration = await fetchYouTubeVideoDuration(videoids)
+    for (let i = 0; i < duration.length; i++) {
+      list[nlist + i]['長さ'] = duration[i]
+    }
+    nlist += list.length
+    if (!data.nextPageToken)
+      break
+    data = await fetchYouTubePlaylist(pid, data.nextPageToken)
   }
-  const duration = await fetchYouTubeVideoDuration(videoids)
-  for (let i = 0; i < list.length; i++) {
-    list[i]['長さ'] = duration[i]
-  }
+
   const dt = util.formatYMD()
   //const fnindex = 'index.csv'
   console.log(list)
@@ -272,6 +298,7 @@ const makeCSV = async function(type, listid, name, filter) {
     fs.writeFileSync(path + dt + '.csv', scsv, 'utf-8')
     fs.writeFileSync(path + 'index.csv', scsv, 'utf-8')
   }
+  console.log(data)
 }
 
 const main = async function() {
@@ -287,12 +314,12 @@ const main = async function() {
   return
   */
   const contents = [
-    // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
+    { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
 
     //{ name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
     //{ name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
     //{ name: 'pcnmiyazaki', type: 'playlist', id: 'PLEELZXgkDttSIaLQNZxLwu9OirMD4hFOX', filter: filterPCNMiyazaki },
-    { name: 'columbiamusic', type: 'playlist', id: 'PL8AHg6vdz1U3V_D8uM2ynhZqTmA93nmeP', filter: filterColumbiaMusic },
+    //{ name: 'columbiamusic', type: 'playlist', id: 'PL8AHg6vdz1U3V_D8uM2ynhZqTmA93nmeP', filter: filterColumbiaMusic },
 
     // { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
 
