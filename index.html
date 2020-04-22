@@ -187,7 +187,7 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
   
   util.shuffle(data)
 
-  const items = []
+  let items = []
   const cnt = {}
   A: for (const d of data) {
     // chks2
@@ -236,12 +236,13 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
       items.push(d)
   }
   //console.log(items.length)
-  for (let i = items.length; i < nhour * weeks.length; i++) {
+  const nitems = nhour * weeks.length
+  items = items.splice(-Math.min(items.length, nitems - nfree))
+  //console.log(items.length)
+  for (let i = items.length; i < nitems; i++) {
     items.push(null)
   }
-  for (let i = 0; i < nfree; i++) {
-    items[util.rnd(items.length)] = null
-  }
+  util.shuffle(items)
   //console.log(items)
 
   const c = document.createElement('div')
@@ -264,7 +265,7 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
   }
   for (let i = 0; i < nhour * weeks.length; i++) {
     const d = items[i]
-    console.log(d)
+    //console.log(d)
     if (i % 5 == 0) {
       const span = document.createElement('span')
       span.textContent = i / 5 + 1
