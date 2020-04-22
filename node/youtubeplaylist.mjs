@@ -172,6 +172,20 @@ const filterFukui = function(stitle) {
     'タイトル': title,
   }
 }
+const filterJA = function(stitle) {
+  const n = stitle.indexOf('chapter')
+  let no = ""
+  if (n >= 0) {
+    no = stitle.substring(n + 'chapter'.length)
+    stitle = stitle.substring(0, n)
+  }
+  return {
+    '対象': '',
+    '科目': '体育',
+    'No': no,
+    'タイトル': stitle,
+  }
+}
 
 const makeCSV = async function(type, listid, name, filter) {
   const path = '../data/' + name + "/"
@@ -215,8 +229,16 @@ const makeCSV = async function(type, listid, name, filter) {
   console.log(list)
   const scsv = util.addBOM(util.encodeCSV(util.json2csv(list)))
   util.mkdirSyncForFile(path)
-  fs.writeFileSync(path + dt + '.csv', scsv, 'utf-8')
-  fs.writeFileSync(path + 'index.csv', scsv, 'utf-8')
+
+  const bkdata = null
+  try {
+    bkdata = fs.readFileSync(path + 'index.csv')
+  } catch (e) {
+  }
+  if (bkdata != scsv) {
+    fs.writeFileSync(path + dt + '.csv', scsv, 'utf-8')
+    fs.writeFileSync(path + 'index.csv', scsv, 'utf-8')
+  }
 }
 
 const main = async function() {
@@ -233,8 +255,12 @@ const main = async function() {
   */
   const contents = [
     // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
-    // { name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
-    { name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
+
+    //{ name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
+    //{ name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
+
+    { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
+
   ]
   for (const c of contents) {
     await makeCSV(c.type, c.id, c.name, c.filter)

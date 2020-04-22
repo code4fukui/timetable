@@ -3,9 +3,9 @@ import fetch from 'node-fetch'
 import iconv from 'iconv-lite'
 import cheerio from 'cheerio'
 
-const util = {}
+const exports = {}
 
-util.simplejson2txt = function(json) {
+exports.simplejson2txt = function(json) {
   if (typeof json == 'string') {
     json = JSON.parse(json)
   }
@@ -19,7 +19,7 @@ util.simplejson2txt = function(json) {
   return res.join('\r\n')
 }
 
-util.decodeCSV = function(s) {
+exports.decodeCSV = function(s) {
 	const res = []
 	let st = 0
 	let line = []
@@ -90,7 +90,7 @@ util.decodeCSV = function(s) {
 	return res
 }
 
-util.encodeCSV = function(csvar) {
+exports.encodeCSV = function(csvar) {
   let s = []
   for (let i = 0; i < csvar.length; i++) {
     let s2 = []
@@ -111,7 +111,7 @@ util.encodeCSV = function(csvar) {
   }
   return s.join('\n')
 }
-util.csv2json = function(csv) {
+exports.csv2json = function(csv) {
 	const res = []
 	const head = csv[0]
 	for (let i = 0; i < head.length; i++) {
@@ -137,7 +137,7 @@ util.csv2json = function(csv) {
 	}
 	return res
 }
-util.json2csv = function(json) {
+exports.json2csv = function(json) {
   if (!Array.isArray(json)) {
     throw 'is not array! at json2csv'
   }
@@ -164,10 +164,10 @@ util.json2csv = function(json) {
   }
   return res
 }
-util.addBOM = function(s) {
+exports.addBOM = function(s) {
   return '\ufeff' + s
 }
-util.writeCSV = function(fnbase, csvar) {
+exports.writeCSV = function(fnbase, csvar) {
   const s = this.encodeCSV(csvar)
   //const bom = new Uint8Array([ 0xEF, 0xBB, 0xBF ]) // add BOM
   //fs.writeFileSync(fnbase + '.csv', bom)
@@ -175,7 +175,7 @@ util.writeCSV = function(fnbase, csvar) {
   //fs.writeFileSync(fnbase + '.sjis.csv', iconv.encode(s, 'ShiftJIS'))
   fs.writeFileSync(fnbase + '.json', JSON.stringify(this.csv2json(csvar)))
 }
-util.readCSV = function(fnbase) {
+exports.readCSV = function(fnbase) {
   try {
     let data = fs.readFileSync(fnbase + '.csv', 'utf-8')
     if (data.charCodeAt(0) == 0xfeff) {
@@ -189,7 +189,7 @@ util.readCSV = function(fnbase) {
     return this.json2csv(json)
   }
 }
-util.readJSONfromCSV = function(fn) {
+exports.readJSONfromCSV = function(fn) {
   try {
     let data = fs.readFileSync(fn, 'utf-8')
     if (data.charCodeAt(0) == 0xfeff) {
@@ -202,50 +202,50 @@ util.readJSONfromCSV = function(fn) {
     return []
   }
 }
-util.writeCSVfromJSON = function(fn, json) {
+exports.writeCSVfromJSON = function(fn, json) {
   const csv = this.json2csv(json)
   const data = this.addBOM(this.encodeCSV(csv))
   this.writeFileSync(fn, data, 'utf-8')
 }
-util.fix0 = function(n, beam) {
+exports.fix0 = function(n, beam) {
   const s = "000000000" + n
   return s.substring(s.length - beam)
 }
-util.formatYMDHMS = function(t) {
+exports.formatYMDHMS = function(t) {
   if (!t)
     t = new Date()
-  const fix0 = util.fix0
+  const fix0 = exports.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2) + "T" + fix0(t.getHours(), 2) + ":" + fix0(t.getMinutes(), 2) + ":" + fix0(t.getSeconds(), 2)
 }
-util.formatYMD = function(t) {
+exports.formatYMD = function(t) {
   if (!t)
     t = new Date()
-  const fix0 = util.fix0
+  const fix0 = exports.fix0
   return t.getFullYear() + "-" + fix0(t.getMonth() + 1, 2) + "-" + fix0(t.getDate(), 2)
 }
-util.getYMDHMS = function() {
+exports.getYMDHMS = function() {
   const t = new Date()
-  const fix0 = util.fix0
+  const fix0 = exports.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2) + fix0(t.getHours(), 2) + fix0(t.getMinutes(), 2) + fix0(t.getSeconds(), 2)
 }
-util.getYMDH = function() {
+exports.getYMDH = function() {
   const t = new Date()
-  const fix0 = util.fix0
+  const fix0 = exports.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2) + fix0(t.getHours(), 2)
 }
-util.getYMD = function() {
+exports.getYMD = function() {
   const t = new Date()
-  const fix0 = util.fix0
+  const fix0 = exports.fix0
   return t.getFullYear() + fix0(t.getMonth() + 1, 2) + fix0(t.getDate(), 2)
 }
-util.cutNoneN = function(s) {
-  s = util.toHalf(s)
+exports.cutNoneN = function(s) {
+  s = exports.toHalf(s)
   const n = parseInt(s.replace(/[^\d]/g, ""))
   if (isNaN(n))
     return 0
   return n
 }
-util.toHalf = function(s) {
+exports.toHalf = function(s) {
   if (s === null || s === undefined)
     return s
   const ZEN = "０１２３４５６７８９（）／ー！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
@@ -262,7 +262,7 @@ util.toHalf = function(s) {
   }
   return s2
 }
-util.toHalfNumber = function(s) {
+exports.toHalfNumber = function(s) {
   const ZEN = "０１２３４５６７８９"
   const HAN = "0123456789"
   let s2 = ""
@@ -277,7 +277,7 @@ util.toHalfNumber = function(s) {
   }
   return s2
 }
-util.mkdirSyncForFile = function(fn) {
+exports.mkdirSyncForFile = function(fn) {
   const dirs = fn.split('/')
   let dir = ""
   for (let i = 0; i < dirs.length - 1; i++) {
@@ -288,11 +288,11 @@ util.mkdirSyncForFile = function(fn) {
     }
   }
 }
-util.writeFileSync = function(fn, data, enc) {
+exports.writeFileSync = function(fn, data, enc) {
   this.mkdirSyncForFile(fn)
   fs.writeFileSync(fn, data, enc)
 }
-util.getExtFromURL = function(url) {
+exports.getExtFromURL = function(url) {
   let ext = ".txt"
   const n = url.lastIndexOf('/')
   const webfn = url.substring(n)
@@ -302,7 +302,7 @@ util.getExtFromURL = function(url) {
   }
   return ext
 }
-util.getHistogram = function(s) {
+exports.getHistogram = function(s) {
   const chs = {}
   for (const c of s) {
     if (!chs[c.charCodeAt(0)])
@@ -317,7 +317,7 @@ util.getHistogram = function(s) {
   ar.sort((a, b) => b[1] - a[1])
   return ar
 }
-util.fetchTextWithLastModified = async function(url, enc, debug) {
+exports.fetchTextWithLastModified = async function(url, enc, debug) {
   const res = await fetch(url)
   let lastUpdate = null
   if (res.status != 200)
@@ -342,13 +342,13 @@ util.fetchTextWithLastModified = async function(url, enc, debug) {
   const buf = new Buffer.from(abuf, 'binary')
   return [ iconv.decode(buf, enc), lastUpdate ]
 }
-util.fetchText = async function(url, enc) {
+exports.fetchText = async function(url, enc) {
   const [ text, lastUpdate ] = await this.fetchTextWithLastModified(url, enc)
   return text
 }
 
 // parse HTML
-util.parseTagsFromHTML = function(html, tag, key) {
+exports.parseTagsFromHTML = function(html, tag, key) {
   const dom = cheerio.load(html)
   const res = []
   dom(tag).each((idx, ele) => {
@@ -358,7 +358,7 @@ util.parseTagsFromHTML = function(html, tag, key) {
   })
   return res
 }
-util.parseTablesFromHTML = function(html) {
+exports.parseTablesFromHTML = function(html) {
   const dom = cheerio.load(html)
   const tbl = []
   const extract = function(ele) {
@@ -380,7 +380,7 @@ util.parseTablesFromHTML = function(html) {
   })
   return tbls
 }
-util.parseDLsFromHTML = function(html) {
+exports.parseDLsFromHTML = function(html) {
   const dom = cheerio.load(html)
   const tbl = []
   const extract = function(ele) {
@@ -408,28 +408,43 @@ util.parseDLsFromHTML = function(html) {
   })
   return tbls
 }
-util.fetchCSVtoJSON = async url => util.csv2json(util.decodeCSV(await util.fetchText(url)))
-util.sleep = async msec => new Promise(resolve => setTimeout(resolve, msec))
-util.copyJSON = d => JSON.parse(JSON.stringify(d))
-util.setJSON = function(dst, src) {
+exports.fetchCSVtoJSON = async url => exports.csv2json(exports.decodeCSV(await exports.fetchText(url)))
+exports.sleep = async msec => new Promise(resolve => setTimeout(resolve, msec))
+exports.copyJSON = d => JSON.parse(JSON.stringify(d))
+exports.setJSON = function(dst, src) {
   for (const name in src) {
     dst[name] = src[name]
   }
   return dst
 }
+exports.splitString = function(s, splitters) {
+  const res = []
+  let n = 0
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charAt(i)
+    if (splitters.indexOf(c) >= 0) {
+      if (i > n)
+        res.push(s.substring(n, i))
+      n = i + 1
+    }
+  }
+  if (n < s.length)
+    res.push(s.substring(n))
+  return res
+}
 
 const main = async function() {
   
 }
-if (process.argv[1].endsWith('/util.mjs')) {
+if (process.argv[1].endsWith('/exports.mjs')) {
   main()
   /*
   const test = [ [ '"abc"', '"', '""', '"""', 'a""b' ] ]
-  const enc = util.encodeCSV(test)
+  const enc = exports.encodeCSV(test)
   console.log(enc)
-  const dec = util.decodeCSV(enc)
+  const dec = exports.decodeCSV(enc)
   console.log(dec)
   */
 }
 
-export default util
+export default exports
