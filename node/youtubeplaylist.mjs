@@ -201,6 +201,22 @@ const filterPCNMiyazaki = function(stitle) {
     'タイトル': stitle,
   }
 }
+const filterColumbiaMusic = function(stitle) {
+  if (stitle.indexOf('NHK DVD教材') >= 0)
+    return null
+  let type = ''
+  if (stitle.indexOf('道徳') >= 0)
+    type = '道徳'
+  if (stitle.indexOf('英語') >= 0)
+    type = '英語'
+  if (stitle.indexOf('外国語') >= 0)
+    type = '外国語'
+  return {
+    '科目': type,
+    'タイトル': stitle,
+  }
+}
+
 
 const makeCSV = async function(type, listid, name, filter) {
   const path = '../data/' + name + "/"
@@ -229,6 +245,8 @@ const makeCSV = async function(type, listid, name, filter) {
       continue
     console.log(s)
     const o = filter(s.title)
+    if (!o)
+      continue
     const videoid = s.resourceId.videoId
     o['公開日'] = s.publishedAt
     o.URL = 'https://www.youtube.com/watch?v=' + videoid
@@ -272,8 +290,9 @@ const main = async function() {
     // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
 
     //{ name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
-    { name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
-    { name: 'pcnmiyazaki', type: 'playlist', id: 'PLEELZXgkDttSIaLQNZxLwu9OirMD4hFOX', filter: filterPCNMiyazaki },
+    //{ name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
+    //{ name: 'pcnmiyazaki', type: 'playlist', id: 'PLEELZXgkDttSIaLQNZxLwu9OirMD4hFOX', filter: filterPCNMiyazaki },
+    { name: 'columbiamusic', type: 'playlist', id: 'PL8AHg6vdz1U3V_D8uM2ynhZqTmA93nmeP', filter: filterColumbiaMusic },
 
     // { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
 
