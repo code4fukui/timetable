@@ -264,7 +264,7 @@ const makeCSV = async function(type, listid, name, filter) {
       if (!s.thumbnails) // private video
         continue
       console.log(s)
-      const o = filter(s.title)
+      const o = filter ? filter(s.title) : { 'タイトル': s.title }
       if (!o)
         continue
       const videoid = s.resourceId.videoId
@@ -314,7 +314,8 @@ const main = async function() {
   return
   */
   const contents = [
-    { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
+    //{ name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
+    { name: 'miraikyoiku', type: 'channel', id: 'UCPQzSBuLEfaMWDWUsqq8p4w' }, 
 
     // { name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
     //{ name: 'kojimayoshio', type: 'playlist', id: 'PLLdkONQoKM9hc8inyYM3Gb-S9YeDVb8Dj', filter: filterKojima },
