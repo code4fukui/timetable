@@ -241,20 +241,20 @@ window.onload = async function() {
 	util.shuffle(data)
 
 	const show = function() {
-		const key = searchbox.value
+		const key = searchbox.value.normalize("NFKC")
 		main.innerHTML = ''
 
 		let hash = key
 		document.location.hash = hash.length > 0 ? '#' + encodeURIComponent(hash) : ""
+		const keys = key.replace(/　/g, ' ').split(' ')
 
 		const items = []
 		A: for (const d of data) {
 			if (key) {
-				const keys = key.replace(/　/g, ' ').split(' ')
 				for (const k of keys) {
 					let flg = false
 					for (const name in d) {
-						if (d[name].indexOf(k) >= 0) {
+						if (d[name].normalize("NFKC").indexOf(k) >= 0) {
 							flg = true
 							break
 						}

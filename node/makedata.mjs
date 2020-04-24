@@ -24,9 +24,13 @@ const makeData = async function() {
       //const d = util.setJSON({}, item)
       let cnt = 0
       for (const a of items) {
+        if (a['有効'] && parseInt(a['有効']) == 0) {
+          continue
+        }
         const d2 = util.copyJSON(item)
         util.setJSON(d2, a)
         delete d2['備考']
+        delete d2['有効']
         data.push(d2)
         if (cnt++ < 3)
           console.log(d2)
