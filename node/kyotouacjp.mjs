@@ -2,6 +2,8 @@ import util from './util.mjs'
 import fs from 'fs'
 import pdf2text from './pdf2text.mjs'
 import fetch from 'node-fetch'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const splitString = function(s, splitters) {
   const res = []
