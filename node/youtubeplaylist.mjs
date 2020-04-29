@@ -71,6 +71,7 @@ const fetchYouTubeVideoDuration = async function(videoid) {
     const json = await fetchYouTubeVideo(videoid.join(','))
     if (!json)
       return null
+    console.log(json)
     const res = []
     for (const d of json.items) {
       res.push(parseDuration(d.contentDetails.duration))
@@ -80,6 +81,7 @@ const fetchYouTubeVideoDuration = async function(videoid) {
     const json = await fetchYouTubeVideo(videoid)
     if (!json)
       return null
+    console.log(json)
     const d = json.items[0].contentDetails
     return parseDuration(d.duration)
   }
@@ -274,8 +276,14 @@ const makeCSV = async function(type, listid, name, filter) {
       videoids.push(videoid)
     }
     const duration = await fetchYouTubeVideoDuration(videoids)
+    console.log(duration.length, videoids.length, nlist)
     for (let i = 0; i < duration.length; i++) {
-      list[nlist + i]['長さ'] = duration[i]
+      const v = list[nlist + i]
+      if (v) {
+        v['長さ'] = duration[i]
+      } else {
+        console.log("?? " + (nlist + i) + " is null")
+      }
     }
     nlist += list.length
     if (!data.nextPageToken)
@@ -301,18 +309,38 @@ const makeCSV = async function(type, listid, name, filter) {
   console.log(data)
 }
 
+const list = 
+  `https://www.youtube.com/watch?v=DYfwKLbmYzo
+  https://www.youtube.com/watch?v=EaJwC4nE4aM
+  https://www.youtube.com/watch?v=kTyZ0B4Z6w0
+  https://www.youtube.com/watch?v=BbH7_X5WoT4
+  https://www.youtube.com/watch?v=ZlXwZpfM9Bs
+  https://www.youtube.com/watch?v=g0mAEnV9pNU
+  https://www.youtube.com/watch?v=nps0iJVyTZo
+  https://www.youtube.com/watch?v=sC0FIsUMhyk
+  https://www.youtube.com/watch?v=DQHDWG9qciY
+  https://www.youtube.com/watch?v=I_OS0LCGNUw
+  https://www.youtube.com/watch?v=qBVZRRrwx1A`
+
 const main = async function() {
   
   //const videoid = 'H_aZRDq9Qxg'
   //const videoid = 'https://www.youtube.com/watch?v=_yncog6eojs&t=16s'
   //const videoid = 'dtauGqnQpig'
+  
+  //const videoid = 'DYfwKLbmYzo,EaJwC4nE4aM' // 'H_aZRDq9Qxg,dtauGqnQpig'
+  //const videoid = [ 'H_aZRDq9Qxg', 'EaJwC4nE4aM' ] // ,dtauGqnQpig'
+  //const videoid = 'H_aZRDq9Qxg' // ,dtauGqnQpig'
   /*
-  const videoid = 'H_aZRDq9Qxg,dtauGqnQpig'
-  const v = await fetchYouTubeVideoDuration(videoid)
-  console.log(v) // duration: 'PT12M27S',
-  console.log(await fetchYouTubeVideoDuration([ 'H_aZRDq9Qxg', 'dtauGqnQpig' ]))
+  const list2 = list.split('\n').map(s => s.substring(s.indexOf('=') + 1))
+  //console.log(list2)
+  //return
+  const v = await fetchYouTubeVideoDuration(list2)
+  console.log(v.join('\n')) // duration: 'PT12M27S',
+  //console.log(await fetchYouTubeVideoDuration([ 'H_aZRDq9Qxg', 'dtauGqnQpig' ]))
   return
   */
+ 
   const contents = [
     { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui },
     //{ name: 'miraikyoiku', type: 'channel', id: 'UCPQzSBuLEfaMWDWUsqq8p4w' }, 
