@@ -31,12 +31,12 @@ const makeData = async function () {
         util.setJSON(d2, a)
         delete d2['備考']
         delete d2['有効']
-        if (!d2['タイトル']) { d2['タイトル'] = d2['教材シリーズ名'] }
         data.push(d2)
         if (cnt++ < 3) { console.log(d2) }
       }
     } else {
       delete item['備考']
+      if (!item['タイトル'] || item['タイトル'].length === 0) { item['タイトル'] = item['教材シリーズ名'] }
       data.push(item)
       console.log(data)
     }
