@@ -30,11 +30,14 @@ const main = async function() {
   const langs = [ '日本語', '英語', '中国語', '韓国語', 'ポルトガル語', 'ベトナム語', 'シンハラ語' ]
   const chkslang = makeLanguageFilter(filters3, langs)
 
-  const chks = [ chkstarget, chkscontents, chkslang ]
+  const ctypes = ['動画', 'テキスト', 'アプリ']
+  const chksctype = makeContentTypeFilter(filters4, ctypes)
+
+  const chks = [chkstarget, chkscontents, chkslang, chksctype]
 
   const show = function() {
     timetable.innerHTML = ''
-    const tt = makeTimeTable(data, chkstarget, chkscontents, chkslang)
+    const tt = makeTimeTable(data, chkstarget, chkscontents, chkslang, chksctype)
     timetable.appendChild(tt)
   }
   let hash = document.location.hash
@@ -80,13 +83,13 @@ window.onload = main
 
 const makeTargetFilter = function(filters) {
  const chks = []
-  const level = { '小学': 6, '中学': 3, '高校': 3, '大人': 1 }
+  const level = { '小学': [1, 3], '小学 ': [4, 6], '中学': [1, 3], '高校': [1, 3], '大人': [1, 1] }
   for (const lv in level) {
     const head = document.createElement('span')
-    head.textContent = lv
+    head.textContent = lv.trim()
     filters.appendChild(head)
     head.chks = []
-    for (let i = 1; i <= level[lv]; i++) {
+    for (let i = level[lv][0]; i <= level[lv][1]; i++) {
       const label = document.createElement('label')
       const chk = document.createElement('input')
       chk.type = 'checkbox'
@@ -178,8 +181,26 @@ const makeLanguageFilter = function(filters, langs) {
   }
   return chks
 }
+const makeContentTypeFilter = function(filters, ctypes) {
+  const chks = []
+  for (const name of ctypes) {
+    const label = document.createElement('label')
+    const chk = document.createElement('input')
+    chk.type = 'checkbox'
+    chk.value = name
+    chk.checked = true
+    label.appendChild(chk)
+    const span = document.createElement('span')
+    span.textContent = name
+    label.appendChild(span)
+    filters.appendChild(label)
+    chks.push(chk)
+    filters.appendChild(document.createElement('br'))
+  }
+  return chks
+}
 
-const makeTimeTable = function(data, chks, chks2, chkslang) {
+const makeTimeTable = function(data, chks, chks2, chkslang, chksctype) {
   const weeks = '月火水木金'
   const nhour = 4
   const nfree = 4
@@ -189,6 +210,7 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
 
   let items = []
   const cnt = {}
+  console.log(data)
   A: for (const d of data) {
     // chks2
     const sname = d['教材シリーズ名']
@@ -200,6 +222,13 @@ const makeTimeTable = function(data, chks, chks2, chkslang) {
     const lang = d['言語'] || '日本語'
     for (const c of chkslang) {
       if (lang.indexOf(c.value) >= 0 && !c.checked)
+        continue A
+    }
+    // chkctype
+    const ctype = d['教材種別'] || '動画'
+    console.log(ctype)
+    for (const c of chksctype) {
+      if (ctype.indexOf(c.value) >= 0 && !c.checked)
         continue A
     }
 
@@ -404,6 +433,7 @@ a {
 <div id='filters1'></div>
 <div id='filters2'></div>
 <div id='filters3'></div>
+<div id='filters4'></div>
 </div>
 
 <div id="link">
