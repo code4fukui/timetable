@@ -177,13 +177,16 @@ window.onload = async function() {
   const data = await util.fetchCSVtoJSON(url)
 	console.log(data)
 
-	const IGNORE_NAMES = [ '教材ID', '提供URL', '機材', 'キーボード', '月', '注意事項など', 'No', '提供' ]
+	// const IGNORE_NAMES = [ '教材ID', '提供URL', '機材', 'キーボード', '月', '注意事項など', 'No', '提供' ]
+	const SHOW_NAMES = ['教材シリーズ名', '教材種別', '対象', '言語', '科目']
 	const SPLIT = [ '対象' ]
-	const SORT_KEY = { '対象': "小中高特大", '言語': '日英中韓' }
+	const SORT_KEY = { '対象': "小中高特大", '言語': '日英中韓', '科目': '国算数理社外英G' }
 	for (const name in data[0]) {
-		if (IGNORE_NAMES.indexOf(name) >= 0)
-			continue
+		// if (IGNORE_NAMES.indexOf(name) >= 0)
+		//	continue
+		if (SHOW_NAMES.indexOf(name) === -1) { continue }
 		const list = []
+		const count = {}
 		for (const d of data) {
 			const v = d[name]
 			if (v && v.length > 0) {
@@ -192,18 +195,24 @@ window.onload = async function() {
 					for (const v3 of v2) {
 						if (list.indexOf(v3) == -1) {
 							list.push(v3)
+							count[v3] = 1
+						} else {
+							count[v3]++
 						}
 					}
 				} else {
 					if (list.indexOf(v) == -1) {
 						list.push(v)
+						count[v] = 1
+					} else {
+						count[v]++
 					}
 				}
 			}
 		}
 		const sortkey = SORT_KEY[name]
 		if (sortkey) {
-			console.log(name, sortkey)
+			//console.log(name, sortkey)
 			list.sort((a, b) => {
 				const n = sortkey.indexOf(a.charAt(0))
 				const m = sortkey.indexOf(b.charAt(0))
@@ -226,13 +235,18 @@ window.onload = async function() {
 		} else {
 			//list.sort()
 		}
-		list.unshift(name)
-		if (list.length > 1 && list.length < 30) {
+		//list.unshift(name)
+		if (list.length > 1) { // && list.length < 30) {
 			const sel = document.createElement("select")
+			const opt = document.createElement('option')
+			opt.textContent = name
+			sel.appendChild(opt)
 			for (const v of list) {
-				const opt = document.createElement('option')
-				opt.textContent = v
-				sel.appendChild(opt)
+				if (list.length < 30 || count[v] > data.length / 100) { // over 1%
+					const opt = document.createElement('option')
+					opt.textContent = v
+					sel.appendChild(opt)
+				}
 			}
 			selectboxes.appendChild(sel)
 		}
