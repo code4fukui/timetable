@@ -248,8 +248,8 @@ exports.cutNoneN = function(s) {
 exports.toHalf = function(s) {
   if (s === null || s === undefined)
     return s
-  const ZEN = "０１２３４５６７８９（）／ー！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
-  const HAN = "0123456789()/-!&: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  const ZEN = "０１２３４５６７８９（）／ー－！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+  const HAN = "0123456789()/--!&: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   let s2 = ""
   for (let i = 0; i < s.length; i++) {
     const c = s.charAt(i)
