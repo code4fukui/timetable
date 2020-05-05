@@ -20,6 +20,8 @@
 "19","家庭学習教材ポピーを無料公開(4/30まで)","テキスト","小学生","算数","全家研月刊ポピー","https://www.popy.jp/freedl/","https://docs.google.com/spreadsheets/d/e/2PACX-1vRgO3nn0ooqyQ2BnSxnGpbHJsW-YPMXab59IpFOKgXmlUszo61ifeDAACAy6cndGjxFdpyDv6bGMmFL/pub?gid=0&single=true&output=csv","『月刊ポピー』では、新型コロナウイルス感染症拡大による休校措置へのご家庭での対応手段の一つとして、ご自宅で家庭学習ができる小学生向け教材のPDFをWeb上で無料公開いたします。"
 "20","小学校教材DVD サンプル映像","動画","小学生",,"ColumbiaMusicJp","https://www.youtube.com/playlist?list=PL8AHg6vdz1U3V_D8uM2ynhZqTmA93nmeP","https://code4fukui.github.io/timetable/data/columbiamusic/index.csv",
 "21","未来教育舎","動画","小中学生",,"進学予備校 未来教育舎","https://www.youtube.com/channel/UCPQzSBuLEfaMWDWUsqq8p4w/videos","https://code4fukui.github.io/timetable/data/miraikyoiku/miraikyoiku.csv",
-"22","まあちゃんのExcelArtって何？","動画","大人",,"若宮正子","https://www.youtube.com/user/Marchan76/videos","https://code4fukui.github.io/timetable/data/masakowakamiya/index.csv",
+"22","まあちゃんのExcelArtって何？","動画","大人","美術","若宮正子","https://www.youtube.com/user/Marchan76/videos","https://code4fukui.github.io/timetable/data/masakowakamiya/index.csv",
 "23","自学サポートアプリ JIGAKU","アプリ",,,"福野泰介","https://code4fukui.github.io/jigaku/","https://code4fukui.github.io/jigaku/index.csv",
 "24","コトバハカセ","アプリ","小学生","外国語","ギフトテンインダストリ株式会社","https://gift10.net/app/kotobahakase/","https://gift10.net/app/kotobahakase/","聞いて発見！遊んで覚える世界の言葉！楽しみながら外国語を学べるゲームです。英語、中国語、韓国語、タガログ語、ポルトガル語、ベトナム語に対応"
+"25","デジタル教材－熊本市教育センター","アプリ","小中学生",,"熊本市教育センター","http://www.kumamoto-kmm.ed.jp/kyouzai/dg-materials.htm","https://docs.google.com/spreadsheets/d/e/2PACX-1vSSI9DYqkXRAeXx-6dI8HIcvIZhgbVju0VlA0sZoM9Xaz3zT_GLr7dEKUjRChBW6I3pkrhvb-1CcCgX/pub?gid=0&single=true&output=csv","学習用、授業用の教材として、先生方のご希望に沿って教育センターが作成したオリジナル教材です。"
+"26","ベネッセ教育情報サイト 動画ライブラリ","動画","小中学生",,"株式会社ベネッセコーポレーション","https://benesse.jp/movie/","https://docs.google.com/spreadsheets/d/e/2PACX-1vSY2abdClGsi2ZH4ZsTyGfxbLQx23iVPL_IkohYHU2ijyUcvrAI-tEczRw_FzmIJ_y34XE6EYfLF96t/pub?gid=0&single=true&output=csv",
