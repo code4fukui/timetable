@@ -261,9 +261,11 @@ const makeTimeTable = function(data, chks, chks2, chkslang, chksctype) {
     } else {
       cnt[type]++
     }
-    if (cnt[type] <= limit)
+    if (cnt[type] <= limit) {
       items.push(d)
+    }
   }
+  util.shuffle(items)
   //console.log(items.length)
   const nitems = nhour * weeks.length
   items = items.splice(-Math.min(items.length, nitems - nfree))
