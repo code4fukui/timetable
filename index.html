@@ -83,7 +83,7 @@ window.onload = main
 
 const makeTargetFilter = function(filters) {
  const chks = []
-  const level = { '小学': [1, 3], '小学 ': [4, 6], '中学': [1, 3], '高校': [1, 3], '大人': [1, 1] }
+  const level = { '小学': [1, 3], '小学': [4, 6], '中学': [1, 3], '高校': [1, 3], '大人': [1, 1] }
   for (const lv in level) {
     const head = document.createElement('span')
     head.textContent = lv.trim()
@@ -112,6 +112,7 @@ const makeTargetFilter = function(filters) {
     }
     filters.appendChild(document.createElement('br'))
   }
+  console.log(chks)
   return chks
 }
 const makeContentsFilter = function(filters, data, materials) {
@@ -226,7 +227,6 @@ const makeTimeTable = function(data, chks, chks2, chkslang, chksctype) {
     }
     // chkctype
     const ctype = d['教材種別'] || '動画'
-    console.log(ctype)
     for (const c of chksctype) {
       if (ctype.indexOf(c.value) >= 0 && !c.checked)
         continue A
