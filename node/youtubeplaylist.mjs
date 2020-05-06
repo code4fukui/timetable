@@ -712,8 +712,8 @@ const main = async function () {
   util.writeCSV('../data/19chtv/19chtv', util.json2csv(res))
   return
   */
-  normalizeList('../data/yobinorimanabu/yobinori', '../data/yobinorimanabu/index.csv', filterYobinori)
-  return
+  // normalizeList('../data/yobinorimanabu/yobinori', '../data/yobinorimanabu/index.csv', filterYobinori)
+  // return
 
   /*
   // get channelId by video
@@ -752,9 +752,9 @@ const main = async function () {
     // { name: 'masakowakamiya', type: 'playlist', id: 'PLMLiIqfcPDBrXbp8QgzwK0PTMsF9SFQzr' },
 
     // { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
-    // { name: 'toaruotoko', type: 'allplaylists', id: 'UCzDd3Byvt91oyf3ggRlTb3A' } // 
-    { name: 'yobinorimanabu', type: 'allplaylists', id: 'UCqmWJJolqAgjIdLqK3zD1QQ', filter: filterYobinori } // https://www.youtube.com/channel/UCqmWJJolqAgjIdLqK3zD1QQ/playlists // 予備校のノリで学ぶ「大学の数学・物理」
-    // { name: 'nakatayoutubeuniv', type: 'allplaylists', id: 'UCFo4kqllbcQ4nV83WCyraiw', filter: filterToaruotoko } // https://www.youtube.com/channel/UCFo4kqllbcQ4nV83WCyraiw/playlists
+    // { name: 'yobinorimanabu', type: 'allplaylists', id: 'UCqmWJJolqAgjIdLqK3zD1QQ', filter: filterYobinori } // https://www.youtube.com/channel/UCqmWJJolqAgjIdLqK3zD1QQ/playlists // 予備校のノリで学ぶ「大学の数学・物理」
+    // { name: 'nakatayoutubeuniv', type: 'allplaylists', id: 'UCFo4kqllbcQ4nV83WCyraiw' } // https://www.youtube.com/channel/UCFo4kqllbcQ4nV83WCyraiw/playlists
+    { name: 'toaruotoko', type: 'allplaylists', id: 'UCzDd3Byvt91oyf3ggRlTb3A', filter: filterToaruotoko } // とある男が授業をしてみた
 
   ]
   for (const c of contents) {
