@@ -958,7 +958,7 @@ const main = async function () {
     // { name: 'nakatayoutubeuniv', type: 'allplaylists', id: 'UCFo4kqllbcQ4nV83WCyraiw' } // https://www.youtube.com/channel/UCFo4kqllbcQ4nV83WCyraiw/playlists
     // { name: 'toaruotoko', type: 'allplaylists', id: 'UCzDd3Byvt91oyf3ggRlTb3A', filter: filterToaruotoko } // とある男が授業をしてみた
     // { name: 'osakadaitocity', type: 'channel', id: 'UCBmt8OAqYK8hTmIpXdb9jxA', filter: filterOsakaDaitoCity },
-    // { name: 'sapporoticy', type: 'playlist', id: 'PLEbfx-hgecSHF9yjQJtZv6JAaHmmGOSXw', filter: filterSapporoCity },
+    // { name: 'sapporocity', type: 'playlist', id: 'PLEbfx-hgecSHF9yjQJtZv6JAaHmmGOSXw', filter: filterSapporoCity },
     // { name: 'setagayaku', type: 'playlist', id: 'PL1O_I1MUHTIYpriqL3GN7cBOVpmcvLBd4', filter: filterSetagayaKu },
     { name: 'naganopref', type: 'allplaylists', id: 'UCLHlam9CjT4a2sAO84XYeXw', filter: filterNaganoPref },
   ]
