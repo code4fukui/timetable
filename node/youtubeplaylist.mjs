@@ -101,27 +101,29 @@ const fetchYouTubeVideoDuration = async function (videoid) {
 
 const normalizeTarget = function (a) {
   a = util.toHalf(a)
-  if (a === '小学校低学年') {
+  if (a.indexOf('小学校低学年') >= 0 || a.indexOf('小学生低学年') >= 0 || a.indexOf('小低学年') >= 0) {
     return '小学1年/小学2年/小学3年'
-  } else if (a === '小学校高学年') {
+  } else if (a.indexOf('小学校高学年') >= 0 || a.indexOf('小学生高学年') >= 0) {
     return '小学4年/小学5年/小学6年'
-  } else if (a === '小・中学校共通') {
+  } else if (a.indexOf('小学校中学年') >= 0 || a.indexOf('小学生中学年') >= 0) {
+    return '小学3年/小学4年'
+  } else if (a === '小・中' || a.indexOf('小・中学校共通') >= 0) {
     return '小中学生'
-  } else if (a.match(/小\d/)) {
-    return '小学' + a.charAt(1) + '年'
-  } else if (a.match(/中\d/)) {
-    return '中学' + a.charAt(1) + '年'
-  } else if (a.match(/高\d/)) {
-    return '高校' + a.charAt(1) + '年'
-  } else if (a.match(/小学校\d年/)) {
-    return '小学' + a.charAt(3) + '年'
-  } else if (a.match(/中学校\d年/)) {
-    return '中学' + a.charAt(3) + '年'
-  } else if (a.match(/高校\d年/)) {
-    return '高校' + a.charAt(2) + '年'
+  } else if (a === '小学校' || a === '小全' || a.indexOf('小学生向け') >= 0 || a.indexOf('全学年向け') >= 0) {
+    return '小学生'
+  } else if (a === '中学' || a === '中学校' || a.indexOf('中学生向け') >= 0) {
+    return '中学生'
+  } else if (a.indexOf('小学校中学年以上') >= 0) {
+    return '小学3年/小学4年/小学5年/小学6年'
   }
-  console.log('other', a)
-  return a
+  let n = a.match(/小学?校?(\d)/)
+  if (n) { return '小学' + n[1] + '年' }
+  n = a.match(/中学?校?(\d)/)
+  if (n) { return '中学' + n[1] + '年' }
+  n = a.match(/高校?(\d)/)
+  if (n) { return '高校' + n[1] + '年' }
+  // console.log('other', a)
+  return null
 }
 const normalizeType = function (s) {
   if (s === 'G・S' || s === 'G・S') {
@@ -140,10 +142,34 @@ const normalizeType = function (s) {
     return '理科'
   } else if (s.endsWith('英語')) {
     return '英語'
+  } else if (s === '家庭科') {
+    return '家庭'
   }
-  let n = s.match(/[小|中|高]\s?(.+)$/)
+  const n = s.match(/[小|中|高]\s?(.+)$/)
   if (n) {
     return n[1]
+  }
+  return s
+}
+const normalizeType2 = function (s) {
+  if (s === 'G・S' || s === 'G・S') {
+    return '英語'
+  } else if (s === '体育・保健体育') {
+    return '体育'
+  } else if (s === '図画工作') {
+    return '図工'
+  } else if (s === '外国語活動') {
+    return '外国語'
+  } else if (s.endsWith('数学')) {
+    return '数学'
+  } else if (s.endsWith('算数')) {
+    return '算数'
+  } else if (s.endsWith('理科')) {
+    return '理科'
+  } else if (s.endsWith('英語')) {
+    return '英語'
+  } else if (s === '家庭科') {
+    return '家庭'
   }
   return s
 }
@@ -264,7 +290,7 @@ const filterColumbiaMusic = function (stitle) {
   }
 }
 
-const fetchVideoDataFromPlaylist = async function (pid, filter, skipduration) {
+const fetchVideoDataFromPlaylist = async function (pid, filter, ptitle) {
   let data = await fetchYouTubePlaylist(pid)
   console.log(data, 'fetchYouTubePlaylist')
   const list = []
@@ -277,7 +303,7 @@ const fetchVideoDataFromPlaylist = async function (pid, filter, skipduration) {
         continue
       }
       // console.log(s)
-      const o = filter ? filter(s.title) : { タイトル: s.title }
+      const o = filter ? filter(s.title, ptitle) : { タイトル: s.title }
       if (!o) {
         continue
       }
@@ -287,13 +313,11 @@ const fetchVideoDataFromPlaylist = async function (pid, filter, skipduration) {
       list.push(o)
       videoids.push(videoid)
     }
-    if (!skipduration) {
-      const duration = await fetchYouTubeVideoDuration(videoids)
-      console.log(duration.length, videoids.length, nlist)
-      for (let i = 0; i < duration.length; i++) {
-        const v = list[nlist + i]
-        v['長さ'] = duration[i]
-      }
+    const duration = await fetchYouTubeVideoDuration(videoids)
+    console.log(duration.length, videoids.length, nlist)
+    for (let i = 0; i < duration.length; i++) {
+      const v = list[nlist + i]
+      v['長さ'] = duration[i]
     }
     nlist += videoids.length
     if (!data.nextPageToken) {
@@ -323,12 +347,12 @@ const saveCSV = function (path, list) {
 const makeCSV = async function (type, listid, name, filter) {
   const path = '../data/' + name + '/'
   if (type === 'playlist') {
-    const list = await fetchVideoDataFromPlaylist(listid)
+    const list = await fetchVideoDataFromPlaylist(listid, filter)
     saveCSV(path, list)
   } else if (type === 'channel') {
     const data = await fetchYouTubeChannel(listid)
     const pid = data.items[0].contentDetails.relatedPlaylists.uploads
-    const list = await fetchVideoDataFromPlaylist(pid)
+    const list = await fetchVideoDataFromPlaylist(pid, filter)
     saveCSV(path, list)
   } else if (type === 'allplaylists') {
     let data = await fetchYouTubePlaylists(listid)
@@ -339,8 +363,7 @@ const makeCSV = async function (type, listid, name, filter) {
         const pid = d.id
         // console.log(d.snippet)
         const ptitle = d.snippet.title
-        const skipduration = false
-        const list = await fetchVideoDataFromPlaylist(pid, null, skipduration)
+        const list = await fetchVideoDataFromPlaylist(pid, filter, ptitle)
         list.forEach(i => {
           i.ptitle = ptitle
           i.playlistId = pid
@@ -668,6 +691,185 @@ const normalizeList = function (dst, src, filter) {
   util.writeCSV(dst, util.json2csv(res))
 }
 
+const filterOsakaDaitoCity = function (stitle) {
+  const n = stitle.match(/^【(.+)】(.+)$/)
+  if (!n) { return null }
+  const sub = n[1]
+  const title = n[2]
+  if (!sub.startsWith('家庭学習のおたすけ')) { return null }
+  let m = title.indexOf('『')
+  if (m >= 0) {
+    return {
+      タイトル: title.substring(m),
+      科目: '理科',
+      対象: normalizeTarget(title)
+    }
+  }
+  m = title.indexOf('No')
+  if (m >= 0) {
+    return {
+      タイトル: title.substring(m),
+      科目: '英語',
+      対象: normalizeTarget(title)
+    }
+  }
+  return null
+}
+const filterSapporoCity = function (stitle) {
+  const parseType = function (s) {
+    if (s.indexOf('算数') >= 0) { return '算数' }
+    if (s.indexOf('英語') >= 0) { return '英語' }
+    if (s.indexOf('外国語') >= 0) { return '外国語' }
+    if (s.indexOf('縄跳び') >= 0 || s.indexOf('体つくり') >= 0) { return '体育' }
+    return null
+  }
+  const n = stitle.match(/^【(.+)】(.+)$/)
+  if (!n) { return null }
+  const title = n[2]
+  const type = parseType(title)
+  const target = normalizeTarget(title) || '小学生'
+  if (!type) { return null }
+  return {
+    タイトル: title,
+    科目: parseType(title),
+    対象: target
+  }
+}
+const filterSetagayaKu = function (stitle) {
+  const n = stitle.match(/^【(.+)】(.+)「(.+)」(.+)$/)
+  if (!n) { return null }
+  let type = n[2]
+  const title = n[3]
+  let target = normalizeTarget(n[4])
+  if (!target) {
+    if (type === '外国語活動') {
+      type = '外国語'
+      target = '小学3年/小学4年'
+    } else if (type === '家庭') {
+      target = '小学5年/小学6年'
+    } else {
+      console.log('other', stitle)
+    }
+  } else if (type === '外国語活動') {
+    type = '外国語'
+  }
+  return {
+    タイトル: title,
+    科目: type,
+    対象: target
+  }
+}
+const filterNaganoPref = function (stitle, ptitle) {
+  if (ptitle.indexOf('スタート・メイキング等') >= 0) { return null }
+  if (ptitle === '信州型ユニバーサルデザイン研修シリーズ') {
+    const n = normalizeTitle(stitle).match(/\((\d+)\)/)
+    const no = n ? n[1] : ''
+    return {
+      タイトル: stitle.match(/「(.+)」/)[1],
+      No: no,
+      科目: '教育学',
+      対象: '大人'
+    }
+  }
+  if (stitle.indexOf('Private video') >= 0 || stitle.indexOf('Deleted video') >= 0) { return null }
+  if (stitle.indexOf('タオルで遊ぼう') >= 0 || stitle.indexOf('グーパージャンプ') >= 0) {
+    if (ptitle.indexOf('中学１年生') === -1) { return null }
+    return {
+      タイトル: stitle,
+      科目: '体育',
+      対象: '中学生'
+    }
+  }
+  if (stitle.indexOf('道案内') >= 0) {
+    // console.log(stitle)
+    return {
+      タイトル: stitle.substring(3),
+      科目: '英語',
+      対象: '中学3年'
+    }
+  }
+  if (stitle.indexOf('物質の成り立ち') >= 0) {
+    // console.log(stitle)
+    return {
+      タイトル: '物質の成り立ち',
+      科目: '理科',
+      対象: '中学2年'
+    }
+  }
+  if (stitle.indexOf('花のつくり') >= 0) {
+    // console.log(stitle)
+    return {
+      タイトル: stitle.substring(6),
+      科目: '理科',
+      対象: '中学1年'
+    }
+  }
+  if (stitle.indexOf('マスクを作ろう') >= 0) {
+    if (ptitle.indexOf('中学１年生') === -1) { return null }
+    return {
+      タイトル: stitle,
+      科目: '家庭',
+      対象: '小中学生'
+    }
+  }
+  const ss = stitle.split('＿')
+  if (ss.length >= 3) {
+    return {
+      タイトル: ss[2],
+      科目: normalizeType(ss[0]),
+      対象: normalizeTarget(ss[1])
+    }
+  } else if (ss.length === 2) {
+    return {
+      タイトル: ss[1],
+      科目: normalizeType(ss[0]),
+      対象: normalizeTarget(ptitle)
+    }
+  }
+  stitle = stitle.replace(/　/g, ' ')
+  let num = stitle.match(/^(.+) (.+) (.+)$/)
+  if (num) {
+    if (num[2] === '3年生') {
+      num[2] = '中学3年'
+    }
+    let type = null
+    let target = normalizeTarget(num[1])
+    if (target) {
+      type = normalizeType(num[2])
+    } else {
+      target = normalizeTarget(num[2])
+      type = normalizeType(num[1])
+    }
+    if (type && target) {
+      return {
+        タイトル: num[3],
+        科目: type,
+        対象: target
+      }
+    }
+  }
+  if (stitle.indexOf('Lesson') >= 0) {
+    return {
+      タイトル: stitle.substring(7),
+      科目: '英語',
+      対象: '中学3年'
+    }
+  }
+  num = stitle.match(/^(.+) (.+)$/)
+  if (num) {
+    return {
+      タイトル: num[2],
+      科目: '数学',
+      対象: normalizeTarget(num[1])
+    }
+  }
+
+  console.log(stitle, ptitle)
+
+  
+  return null
+}
+
 const main = async function () {
   /*
   const list = util.readJSONfromCSV('../data/toaruotoko/index.csv')
@@ -712,7 +914,7 @@ const main = async function () {
   util.writeCSV('../data/19chtv/19chtv', util.json2csv(res))
   return
   */
-  // normalizeList('../data/yobinorimanabu/yobinori', '../data/yobinorimanabu/index.csv', filterYobinori)
+  // normalizeList('../data/naganopref/index2', '../data/naganopref/index.csv', filterNaganoPref)
   // return
 
   /*
@@ -754,8 +956,11 @@ const main = async function () {
     // { name: 'jakyosai', type: 'channel', id: 'UCaoWo7xRE-ZBI5jWORv9_Jw', filter: filterJA },
     // { name: 'yobinorimanabu', type: 'allplaylists', id: 'UCqmWJJolqAgjIdLqK3zD1QQ', filter: filterYobinori } // https://www.youtube.com/channel/UCqmWJJolqAgjIdLqK3zD1QQ/playlists // 予備校のノリで学ぶ「大学の数学・物理」
     // { name: 'nakatayoutubeuniv', type: 'allplaylists', id: 'UCFo4kqllbcQ4nV83WCyraiw' } // https://www.youtube.com/channel/UCFo4kqllbcQ4nV83WCyraiw/playlists
-    { name: 'toaruotoko', type: 'allplaylists', id: 'UCzDd3Byvt91oyf3ggRlTb3A', filter: filterToaruotoko } // とある男が授業をしてみた
-
+    // { name: 'toaruotoko', type: 'allplaylists', id: 'UCzDd3Byvt91oyf3ggRlTb3A', filter: filterToaruotoko } // とある男が授業をしてみた
+    // { name: 'osakadaitocity', type: 'channel', id: 'UCBmt8OAqYK8hTmIpXdb9jxA', filter: filterOsakaDaitoCity },
+    // { name: 'sapporoticy', type: 'playlist', id: 'PLEbfx-hgecSHF9yjQJtZv6JAaHmmGOSXw', filter: filterSapporoCity },
+    // { name: 'setagayaku', type: 'playlist', id: 'PL1O_I1MUHTIYpriqL3GN7cBOVpmcvLBd4', filter: filterSetagayaKu },
+    { name: 'naganopref', type: 'allplaylists', id: 'UCLHlam9CjT4a2sAO84XYeXw', filter: filterNaganoPref },
   ]
   for (const c of contents) {
     await makeCSV(c.type, c.id, c.name, c.filter)
