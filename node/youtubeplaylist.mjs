@@ -944,7 +944,7 @@ const main = async function () {
   */
 
   const contents = [
-    // { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui }
+    { name: 'fukuipref', type: 'channel', id: 'UC_ZMXFvvu-YWEbk0wK79jhw', filter: filterFukui }
     // { name: 'miraikyoiku', type: 'channel', id: 'UCPQzSBuLEfaMWDWUsqq8p4w' },
 
     // { name: 'saitamacity', type: 'playlist', id: 'PLhOpFff6DKIkPLwurIS8cnVUw6-_FkXXj', filter: filterSaitama },
@@ -960,7 +960,7 @@ const main = async function () {
     // { name: 'osakadaitocity', type: 'channel', id: 'UCBmt8OAqYK8hTmIpXdb9jxA', filter: filterOsakaDaitoCity },
     // { name: 'sapporocity', type: 'playlist', id: 'PLEbfx-hgecSHF9yjQJtZv6JAaHmmGOSXw', filter: filterSapporoCity },
     // { name: 'setagayaku', type: 'playlist', id: 'PL1O_I1MUHTIYpriqL3GN7cBOVpmcvLBd4', filter: filterSetagayaKu },
-    { name: 'naganopref', type: 'allplaylists', id: 'UCLHlam9CjT4a2sAO84XYeXw', filter: filterNaganoPref },
+    // { name: 'naganopref', type: 'allplaylists', id: 'UCLHlam9CjT4a2sAO84XYeXw', filter: filterNaganoPref },
   ]
   for (const c of contents) {
     await makeCSV(c.type, c.id, c.name, c.filter)
