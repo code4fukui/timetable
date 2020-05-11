@@ -245,12 +245,13 @@ exports.cutNoneN = function(s) {
     return 0
   return n
 }
-exports.toHalf = function(s) {
-  if (s === null || s === undefined)
+exports.toHalf = function (s) {
+  if (s === null || s === undefined) {
     return s
+  }
   const ZEN = "０１２３４５６７８９（）／ー－！＆：　ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
   const HAN = "0123456789()/--!&: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  let s2 = ""
+  let s2 = ''
   for (let i = 0; i < s.length; i++) {
     const c = s.charAt(i)
     const n = ZEN.indexOf(c)
