@@ -290,6 +290,8 @@ const filterColumbiaMusic = function (stitle) {
   }
 }
 
+const normalizeDateTime = dt => dt.endsWith('.000Z') ? dt.substring(0, dt.length - 5) : dt
+
 const fetchVideoDataFromPlaylist = async function (pid, filter, ptitle) {
   let data = await fetchYouTubePlaylist(pid)
   console.log(data, 'fetchYouTubePlaylist')
@@ -308,7 +310,7 @@ const fetchVideoDataFromPlaylist = async function (pid, filter, ptitle) {
         continue
       }
       const videoid = s.resourceId.videoId
-      o['公開日'] = s.publishedAt
+      o['公開日'] = normalizeDateTime(s.publishedAt)
       o.URL = 'https://www.youtube.com/watch?v=' + videoid
       list.push(o)
       videoids.push(videoid)
